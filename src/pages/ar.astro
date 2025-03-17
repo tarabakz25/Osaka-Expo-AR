@@ -1,0 +1,106 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="神山まるごと高専 AR">
+  <!-- スクリプトをhead内に移動し、バージョンを調整 -->
+  <script is:inline src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
+  <script is:inline src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
+  
+  <main>
+    <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: false;">
+      <a-marker preset="hiro">
+        <a-text
+          value=""
+          position="0 0 0"
+          align="center"
+          rotation="-90 0 0"
+          id="ar-text">
+        </a-text>
+      </a-marker>
+      <a-entity camera></a-entity>
+    </a-scene>
+    <div id="overlay" class="overlay"></div>
+    <div id="message" class="message"></div>
+  </main>
+</Layout>
+
+<style>
+  main {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  .arjs-loader {
+    height: 100%;
+    width: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background-color: rgba(0, 0, 0, 0.8);
+    z-index: 9999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    font-size: 1.25rem;
+    text-align: center;
+  }
+
+  .overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: black;
+    opacity: 0;
+    transition: opacity 1.5s ease;
+    pointer-events: none;
+    z-index: 1000;
+  }
+
+  .message {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-size: 1.5rem;
+    text-align: center;
+    opacity: 0;
+    transition: opacity 1s ease;
+    z-index: 1001;
+  }
+
+  a-scene {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+  }
+</style>
+
+<!-- クライアントサイドのスクリプト -->
+<script>
+  import { initAR } from '../scripts/ar';
+  
+  // ページが完全に読み込まれてからARを初期化
+  document.addEventListener('DOMContentLoaded', () => {
+    // ARJSの読み込み待機
+    const scene = document.querySelector('a-scene');
+    if (scene.hasLoaded) {
+      initAR();
+    } else {
+      scene.addEventListener('loaded', initAR);
+    }
+    
+    // ローディング表示を非表示
+    scene.addEventListener('camera-set-active', () => {
+      document.querySelector('.arjs-loader').style.display = 'none';
+    });
+  });
+</script>

@@ -9,7 +9,9 @@
     "astro": "astro"
   },
   "dependencies": {
+    "@ar-js-org/ar.js": "^3.4.7",
     "astro": "^5.4.1",
-    "three": "^0.174.0"
+    "three": "^0.174.0",
+    "vanta": "^0.5.24"
   }
 }

@@ -3,6 +3,8 @@ import Layout from "../layouts/Layout.astro"
 
 import { Image } from "astro:assets"
 import KamiyamaLogo from "../assets/Kamiyama_Logo.svg"
+
+import '../styles/global.css'
 ---
 
 <Layout>
@@ -10,48 +12,10 @@ import KamiyamaLogo from "../assets/Kamiyama_Logo.svg"
 		<div class="landing-content">
 			<Image src={KamiyamaLogo} alt="Kamiyama Logo" class="kamiyama-logo" />
 			<h1>神山まるごと高専ARプロジェクトへようこそ</h1>
-			<button id="start-ar-btn">AR体験を開始</button>
+			<a href="/ar">start</a>
 		</div>
 	</div>
-	<div id="ar-container" class="hidden"></div>
 </Layout>
-
-<script is:inline>
-	// ランディングページから AR 体験への遷移を処理
-	document.getElementById('start-ar-btn').addEventListener('click', function() {
-		document.getElementById('landing-page').classList.add('hidden');
-		document.getElementById('ar-container').classList.remove('hidden');
-		
-		// AR 関連のスクリプトを読み込む
-		loadARScripts();
-	});
-	
-	// AR 関連スクリプトの読み込み関数
-	function loadARScripts() {
-		// A-Frameスクリプトを動的に読み込む
-		const aframeScript = document.createElement('script');
-		aframeScript.src = 'https://aframe.io/releases/1.3.0/aframe.min.js';
-		aframeScript.onload = function() {
-			// A-Frameが読み込まれた後にAR.jsを読み込む
-			const arjsScript = document.createElement('script');
-			arjsScript.src = 'https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js';
-			arjsScript.onload = function() {
-				// 両方のスクリプトが読み込まれた後にARシーンを作成
-				const container = document.getElementById('ar-container');
-				container.innerHTML = `
-					<a-scene embedded arjs="debugUIEnabled:false;">
-						<a-marker preset="hiro">
-							<a-box position="0 0.5 0" wireframe="true"></a-box>
-						</a-marker>
-						<a-entity camera></a-entity>
-					</a-scene>
-				`;
-			};
-			document.head.appendChild(arjsScript);
-		};
-		document.head.appendChild(aframeScript);
-	}
-</script>
 
 <style>
 	body {
@@ -85,7 +49,7 @@ import KamiyamaLogo from "../assets/Kamiyama_Logo.svg"
 		text-align: center;
 		padding: 2rem;
 		max-width: 800px;
-		font-family: 'SF Pro Text', sans-serif;
+		font-family: var(--default-font);
 	}
 	.landing-content .kamiyama-logo {
 		width: 200px;
@@ -102,9 +66,11 @@ import KamiyamaLogo from "../assets/Kamiyama_Logo.svg"
 		line-height: 1.5;
 	}
 	
-	#start-ar-btn {
-		background-color: #4a80f5;
+	a {
+		font-family: var(--default-font);
+		background-color: var(--accent-color);
 		color: white;
+		text-decoration: none;
 		border: none;
 		padding: 1rem 2rem;
 		font-size: 1rem;
@@ -113,8 +79,8 @@ import KamiyamaLogo from "../assets/Kamiyama_Logo.svg"
 		transition: background-color 0.3s;
 	}
 	
-	#start-ar-btn:hover {
-		background-color: #3a70e5;
+	a:hover {
+		background-color: var(--accent-color);
 	}
 	
 	.hidden {
