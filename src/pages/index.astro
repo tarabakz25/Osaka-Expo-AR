@@ -8,11 +8,14 @@ import '../styles/global.css'
 ---
 
 <Layout>
-	<div id="landing-page">
+	<div id="particles-js" class="particles-container"></div>
+	<div class="landing-page">
 		<div class="landing-content">
-			<Image src={KamiyamaLogo} alt="Kamiyama Logo" class="kamiyama-logo" />
-			<h1>神山まるごと高専ARプロジェクトへようこそ</h1>
-			<a href="/ar">start</a>
+			<div class="logo-container">
+				<Image src={KamiyamaLogo} alt="Kamiyama Logo" class="kamiyama-logo" />
+			</div>
+			<h1 class="welcome-title">神山まるごと高専ARプロジェクトへようこそ</h1>
+			<a href="/ar" class="start-button">start</a>
 		</div>
 	</div>
 </Layout>
@@ -20,70 +23,177 @@ import '../styles/global.css'
 <style>
 	body {
 		margin: 0;
+		padding: 0;
 		overflow: hidden;
-		font-family: Arial, sans-serif;
+		box-sizing: border-box;
 	}
 	
-	#ar-container {
-		position: absolute;
+	.particles-container {
+		position: fixed;
 		top: 0;
 		left: 0;
 		width: 100%;
 		height: 100%;
+		z-index: 1;
+		background-color: #2B4798;
 	}
 	
-	#landing-page {
-		position: absolute;
+	.landing-page {
+		position: fixed;
 		top: 0;
 		left: 0;
 		width: 100%;
-		height: 100%;
-		background-color: #fff;
+		height: 100vh;
 		display: flex;
 		justify-content: center;
 		align-items: center;
-		z-index: 100;
+		z-index: 2;
+		background-color: transparent;
 	}
 	
 	.landing-content {
 		text-align: center;
-		padding: 2rem;
-		max-width: 800px;
+		padding: 1rem;
+		width: 90%;
+		max-width: 500px;
 		font-family: var(--default-font);
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		align-items: center;
 	}
+	
+	.logo-container {
+		margin-bottom: 1.5rem;
+		width: 100%;
+		text-align: center;
+	}
+	
 	.landing-content .kamiyama-logo {
-		width: 200px;
-  		height: auto;
+		width: 100%;
+		max-width: 400px;
+		height: auto;
+		margin: 0 auto;
+		filter: invert(100%);
 	}
 	
-	.landing-content h1 {
-		font-size: 1rem;
-		margin-bottom: 1rem;
+	.welcome-title {
+		font-size: 1.3rem;
+		margin: 1rem 0 1.5rem 0;
+		text-align: center;
+		width: 100%;
+		word-break: keep-all;
+		overflow-wrap: break-word;
+		color: var(--text-color-white);
+		padding: 10px;
+		border-radius: 8px;
 	}
 	
-	.landing-content p {
-		margin-bottom: 1rem;
-		line-height: 1.5;
-	}
-	
-	a {
+	.start-button {
 		font-family: var(--default-font);
 		background-color: var(--accent-color);
 		color: white;
-		text-decoration: none;
 		border: none;
-		padding: 1rem 2rem;
+		padding: 0.8rem 2rem;
 		font-size: 1rem;
 		border-radius: 25px;
 		cursor: pointer;
 		transition: background-color 0.3s;
+		display: inline-block;
+		text-decoration: none;
+		margin-top: 0.5rem;
 	}
 	
-	a:hover {
+	.start-button:hover {
 		background-color: var(--accent-color);
+		opacity: 0.9;
 	}
 	
 	.hidden {
 		display: none !important;
 	}
+	
+	@media (max-width: 480px) {
+		.landing-content {
+			width: 85%;
+			padding: 0.5rem;
+		}
+		
+		.welcome-title {
+			font-size: 1.1rem;
+		}
+		
+		.landing-content .kamiyama-logo {
+			width: 100px;
+		}
+		
+		.start-button {
+			padding: 0.7rem 1.8rem;
+		}
+	}
 </style>
+
+<script is:inline src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+
+<script is:inline>
+	window.onload = function() {
+		particlesJS("particles-js", {
+		  "particles": {
+			"number": {
+			  "value": 100,
+			  "density": {
+				"enable": true,
+				"value_area": 800
+			  }
+			},
+			"color": {
+			  "value": "#A5DFFF"
+			},
+			"shape": {
+			  "type": "circle",
+			  "stroke": {
+				"width": 0,
+				"color": "#A5DFFF"
+			  }
+			},
+			"opacity": {
+			  "value": 0.8,
+			  "random": true
+			},
+			"size": {
+			  "value": 5,
+			  "random": true
+			},
+			"line_linked": {
+			  "enable": false,
+			  "distance": 150,
+			  "color": "#888888",
+			  "opacity": 0.6,
+			  "width": 1
+			},
+			"move": {
+			  "enable": true,
+			  "speed": 1,
+			  "direction": "bottom",
+			  "random": true,
+			  "straight": false
+			}
+		  },
+		  "interactivity": {
+			"detect_on": "canvas",
+			"events": {
+			  "onhover": {
+				"enable": true,
+				"mode": "repulse"
+			  },
+			  "onclick": {
+				"enable": true,
+				"mode": "push"
+			  },
+			  "resize": true
+			}
+		  },
+		  "retina_detect": true
+		});
+	};
+</script>
