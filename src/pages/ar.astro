@@ -3,9 +3,6 @@ import Layout from '../layouts/Layout.astro';
 
 import Fukidashi from '/Fukidashi.glb?url';
 import Hanabi from '/movies/ar-movie_hanabi.mp4?url';
-
-console.log("Fukidashiのパス:", Fukidashi);
-console.log("Hanabiのパス:", Hanabi);
 ---
 
 <Layout>    
@@ -66,6 +63,14 @@ console.log("Hanabiのパス:", Hanabi);
             position="0 0.5 0" 
             rotation="-90 0 0"
             play-on-marker></a-plane>
+
+            <!-- 動画テキストの表示 -->
+            <a-text 
+            value="神山まるごと高専ARプロジェクト" 
+            position="0 0.5 0" 
+            scale="0.5 0.5 0.5" 
+            color="#fff" 
+            align="center"></a-text>
         </a-marker>
         
         <a-entity camera></a-entity>
