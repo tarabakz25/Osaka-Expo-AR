@@ -90,18 +90,20 @@ import '../styles/global.css'
 	}
 	
 	.start-button {
-		font-family: var(--default-font);
-		background-color: var(--accent-color);
+		font-family: var(--default-font-english);
 		color: white;
 		border: none;
 		padding: 0.8rem 2rem;
 		font-size: 1rem;
 		border-radius: 25px;
 		cursor: pointer;
-		transition: background-color 0.3s;
+		transition: all 0.3s;
 		display: inline-block;
 		text-decoration: none;
 		margin-top: 0.5rem;
+		background-color: rgba(255, 255, 255, 0.1);
+		backdrop-filter: blur(10px);
+		-webkit-backdrop-filter: blur(10px);
 	}
 	
 	.start-button:hover {
