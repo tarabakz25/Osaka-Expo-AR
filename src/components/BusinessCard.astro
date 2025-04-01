@@ -1,0 +1,90 @@
+---
+import { Image } from 'astro:assets';
+import Card from '../assets/card.png';
+
+interface Props {
+  name: string;
+  romaji: string;
+  keyword: string;
+}
+
+const { name, romaji, keyword } = Astro.props;
+---
+
+<div class="business-card" style={`background-image: url(${Card.src});`}>
+  <div class="card-content">
+    <div class="card-header">
+      <p class="card-subtitle">神山まるごと高専</p>
+      <h1 class="card-name">{name}</h1>
+      <p class="card-name-roman">{romaji}</p>
+    </div>
+    
+    <div class="card-keyword-section">
+      <p class="keyword-label">Key Word</p>
+      <p class="keyword-tag">#{keyword}</p>
+    </div>
+  </div>
+</div>
+
+<style>
+  .business-card {
+    position: relative;
+    background-size: cover;
+    background-position: center;
+    border-radius: 0;
+    padding: 0;
+    margin: 10px;
+    width: 100%;
+    max-width: 500px;
+    aspect-ratio: 3/4;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .card-content {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+
+  .card-header {
+    width: 100%;
+    text-align: center;
+    padding: 2rem 1rem;
+    flex-grow: 0;
+  }
+
+  .card-subtitle {
+    font-size: 1rem;
+    margin: 0 0 1rem 0;
+    font-weight: normal;
+    color: #333;
+  }
+
+  .card-name {
+    font-size: 2.5rem;
+    margin: 0.5rem 0;
+    font-weight: bold;
+    letter-spacing: 0.1em;
+    color: #000;
+  }
+
+  .card-name-roman {
+    font-size: 1.2rem;
+    margin: 0.5rem 0;
+    letter-spacing: 0.1em;
+    color: #333;
+  }
+
+  .keyword-label {
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+    color: #333;
+  }
+
+  .keyword-tag {
+    font-size: 2rem;
+    font-weight: bold;
+    margin: 0;
+    color: #000;
+  }
+</style>

@@ -1,10 +1,29 @@
 ---
 import Layout from "../layouts/Layout.astro"
-
 import { Image } from "astro:assets"
 import KamiyamaLogo from "../assets/Kamiyama_Logo.svg"
-
 import '../styles/global.css'
+
+import BusinessCard from "../components/BusinessCard.astro"
+
+// メンバー情報を追加
+const projects = [
+	{
+		name: "神山 まる子",
+		romaji: "KAMIYAMA MARUKO",
+		keyword: "entrepreneur"
+	},
+	{
+		name: "神山 まる美",
+		romaji: "KAMIYAMA MARUMI",
+		keyword: "designer"
+	},
+	{
+		name: "神山 まる太",
+		romaji: "KAMIYAMA MARUTA",
+		keyword: "engineer"
+	}
+];
 ---
 
 <Layout>
@@ -14,8 +33,31 @@ import '../styles/global.css'
 			<div class="logo-container">
 				<Image src={KamiyamaLogo} alt="Kamiyama Logo" class="kamiyama-logo" />
 			</div>
-			<h1 class="welcome-title">神山まるごと高専ARプロジェクトへようこそ</h1>
-			<a href="/ar" class="start-button">start</a>
+			<h1 class="welcome-title">大阪・関西万博徳島パビリオン 神山まるごと高専エリアへようこそ</h1>
+			<button class="start-button" id="startButton">次へ</button>
+		</div>
+	</div>
+	<div class="explain_text-page" id="explainPage">
+		<div class="explain-content">
+			<h2>このプロジェクトは？</h2>
+			<p>ここでは、私たち神山まるごと高専生がARを通じて、神山まるごと高専の今を伝えるためのプロジェクトです。</p>
+			<p>目の前にあるマネキンにかざして、実際に神山まるごと高専の"今"を体験してみましょう。</p>
+			<a href="/ar" class="ar-button">次へ</a>
+		</div>
+	</div>
+	<div class="movie_select-page" id="movieSelectPage">
+		<div class="movie-select-content">
+			<h2 class="page-title">メンバー紹介</h2>
+			<div class="member-content">
+				<div class="card-container">
+					<BusinessCard
+						name={projects[0].name}
+						romaji={projects[0].romaji}
+						keyword={projects[0].keyword}
+					/>
+				</div>
+			</div>
+			<button class="select-button">Select</button>
 		</div>
 	</div>
 </Layout>
@@ -35,7 +77,27 @@ import '../styles/global.css'
 		width: 100%;
 		height: 100%;
 		z-index: 1;
-		background-color: #2B4798;
+		background: linear-gradient(45deg, #2B4798, #4A7CE0, #1C52B7, #6A9DFF);
+		background-size: 300% 300%;
+		animation: gradient 10s ease-in-out infinite alternate;
+	}
+	
+	@keyframes gradient {
+		0% {
+			background-position: 0% 0%;
+		}
+		25% {
+			background-position: 50% 50%;
+		}
+		50% {
+			background-position: 100% 100%;
+		}
+		75% {
+			background-position: 50% 50%;
+		}
+		100% {
+			background-position: 0% 0%;
+		}
 	}
 	
 	.landing-page {
@@ -115,6 +177,73 @@ import '../styles/global.css'
 		display: none !important;
 	}
 	
+	.explain_text-page {
+		position: fixed;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100vh;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		z-index: 0;
+		background-color: transparent;
+		opacity: 0;
+		transition: opacity 1.5s ease;
+	}
+	
+	.explain-content {
+		text-align: center;
+		padding: 2rem;
+		width: 90%;
+		max-width: 600px;
+		backdrop-filter: blur(10px);
+		-webkit-backdrop-filter: blur(10px);
+		border-radius: 15px;
+		color: var(--text-color-white);
+	}
+	
+	.explain-content h2 {
+		font-size: 1.5rem;
+		margin-bottom: 1rem;
+	}
+	
+	.explain-content p {
+		margin-bottom: 1rem;
+		line-height: 1.6;
+	}
+	
+	.ar-button {
+		font-family: var(--default-font-english);
+		color: white;
+		border: none;
+		padding: 0.8rem 2rem;
+		font-size: 1rem;
+		border-radius: 25px;
+		cursor: pointer;
+		transition: all 0.3s;
+		display: inline-block;
+		text-decoration: none;
+		margin-top: 1rem;
+		background-color: var(--accent-color);
+	}
+	
+	.ar-button:hover {
+		opacity: 0.9;
+	}
+	
+	.fade-out {
+		opacity: 0;
+		z-index: 0;
+		pointer-events: none;
+	}
+	
+	.fade-in {
+		opacity: 1;
+		z-index: 2;
+		pointer-events: all;
+	}
+	
 	@media (max-width: 480px) {
 		.landing-content {
 			width: 85%;
@@ -132,6 +261,80 @@ import '../styles/global.css'
 		.start-button {
 			padding: 0.7rem 1.8rem;
 		}
+
+		.explain-content {
+			padding: 1.5rem;
+			width: 85%;
+		}
+
+		.explain-content h2 {
+			font-size: 1.3rem;
+		}
+
+		.explain-content p {
+			font-size: 0.9rem;
+		}
+	}
+
+	.movie_select-page {
+		position: fixed;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100vh;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		z-index: 0;
+		opacity: 0;
+		transition: opacity 1.5s ease;
+		background: linear-gradient(45deg, #2B4798, #4A7CE0, #1C52B7, #6A9DFF);
+	}
+
+	.movie-select-content {
+		text-align: center;
+		padding: 2rem;
+		width: 90%;
+		max-width: 1200px;
+		border-radius: 15px;
+		color: white;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+	}
+
+	.page-title {
+		font-size: 2rem;
+		margin-bottom: 2rem;
+		color: white;
+	}
+
+	.member-content {
+		width: 100%;
+		margin-bottom: 1rem;
+		padding: 1rem;
+		display: flex;
+		justify-content: center;
+	}
+
+	.card-container {
+		width: 100%;
+		max-width: 350px;
+	}
+
+	.select-button {
+		color: white;
+		border: none;
+		padding: 0.8rem 3rem;
+		font-size: 1.2rem;
+		border-radius: 10px;
+		cursor: pointer;
+		transition: all 0.3s;
+		background-color: #3a7ca5;
+		margin-top: 2rem;
+		width: 90%;
+		max-width: 400px;
+		font-family: var(--default-font-english);
 	}
 </style>
 
@@ -176,7 +379,7 @@ import '../styles/global.css'
 			"move": {
 			  "enable": true,
 			  "speed": 1,
-			  "direction": "bottom",
+			  "direction": "top",
 			  "random": true,
 			  "straight": false
 			}
@@ -197,5 +400,36 @@ import '../styles/global.css'
 		  },
 		  "retina_detect": true
 		});
+
+		// ページ遷移の処理を追加
+		const startButton = document.getElementById('startButton');
+		const landingPage = document.querySelector('.landing-page');
+		const explainPage = document.getElementById('explainPage');
+		const movieSelectPage = document.getElementById('movieSelectPage');
+		const nextButton = document.querySelector('.ar-button');
+
+		if (startButton && landingPage && explainPage) {
+			startButton.addEventListener('click', function() {
+				landingPage.classList.add('fade-out');
+				setTimeout(() => {
+					explainPage.classList.add('fade-in');
+				}, 500);
+			});
+		}
+
+		if (nextButton && explainPage && movieSelectPage) {
+			nextButton.addEventListener('click', function(e) {
+				e.preventDefault();
+				explainPage.classList.remove('fade-in');
+				explainPage.classList.add('fade-out');
+				setTimeout(() => {
+					movieSelectPage.style.opacity = '1';
+					movieSelectPage.style.zIndex = '2';
+					movieSelectPage.classList.add('fade-in');
+				}, 500);
+			});
+		}
+
+		// カードスクロール関連の処理をすべて削除
 	};
 </script>
