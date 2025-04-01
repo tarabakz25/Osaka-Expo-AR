@@ -1,0 +1,4 @@
+AuthUserFile "/home/kamiyamamarugoto/.htpasswd"
+AuthName "kamiyamamarugoto" 
+AuthType BASIC 
+require valid-user 

@@ -1,48 +1,26 @@
-# Astro Starter Kit: Basics
+# 大阪・関西万博徳島パビリオン 神山まるごと高専エリア
 
-```sh
-npm create astro@latest -- --template basics
-```
+# 概要
+## 背景
+大阪万博2025の徳島パビリオン「水と踊る」への参加が決定し、
+神山まるごと高専も“未来をつくる企業・団体”として選出され、ブース展示を行うことに
+AR技術を活用して“神山まるごと高専”の“今”を伝えたい
 
-[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/withastro/astro/tree/latest/examples/basics)
-[![Open with CodeSandbox](https://assets.codesandbox.io/github/button-edit-lime.svg)](https://codesandbox.io/p/sandbox/github/withastro/astro/tree/latest/examples/basics)
-[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/withastro/astro?devcontainer_path=.devcontainer/basics/devcontainer.json)
+## 狙い
+AR技術を活用して“神山まるごと高専”の“今”を伝えたい
+人と人とのつながりをARを通して体験してもらいたい
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+## 展示の概要
+「ARで“学生の声・姿”を可視化し、神山まるごと高専の“今”をリアルに感じられる仕掛け」
+具体的には、マーカーとなるマネキンを読み取ると、学生たちが作成した動画がAR上に表示される
+学生20～40名から集めた「学校の今」を伝える動画
 
-![just-the-basics](https://github.com/withastro/astro/assets/2244813/a0a5533c-a856-4198-8470-2d67b1d7c554)
+# 操作過程
 
-## 🚀 Project Structure
-
-Inside of your Astro project, you'll see the following folders and files:
-
-```text
-/
-├── public/
-│   └── favicon.svg
-├── src/
-│   ├── layouts/
-│   │   └── Layout.astro
-│   └── pages/
-│       └── index.astro
-└── package.json
-```
-
-To learn more about the folder structure of an Astro project, refer to [our guide on project structure](https://docs.astro.build/en/basics/project-structure/).
-
-## 🧞 Commands
-
-All commands are run from the root of the project, from a terminal:
-
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
-
-## 👀 Want to learn more?
-
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+1. サイトを起動して、タイトル、説明文を確認する。
+2. プロジェクトセレクト画面で、みたいプロジェクトを名刺カードから選択する
+    - 名刺カードは、横スライドで選択できるようにする。
+3. ARを起動してマーカーを読み取る。
+4. マーカーを読み取ると、そこを起点に動画とテキストが表示される。
+    - このとき、テキストはFukidashi.glbで吹き出しを呼び出し、そこで表示する。
+5. 動画が終わると、アンケートが表示される。
