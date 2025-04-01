@@ -11,7 +11,11 @@ interface Props {
 const { name, romaji, keyword } = Astro.props;
 ---
 
-<div class="business-card" style={`background-image: url(${Card.src});`}>
+<!-- このデザインから一切動かすな -->
+
+<div class="business-card">
+  <!-- 背景として画像を直接表示 -->
+  <Image src={Card} alt="名刺背景" class="card-img" />
   <div class="card-content">
     <div class="card-header">
       <p class="card-subtitle">神山まるごと高専</p>
@@ -29,62 +33,91 @@ const { name, romaji, keyword } = Astro.props;
 <style>
   .business-card {
     position: relative;
-    background-size: cover;
-    background-position: center;
-    border-radius: 0;
-    padding: 0;
-    margin: 10px;
-    width: 100%;
-    max-width: 500px;
-    aspect-ratio: 3/4;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: auto; 
+    height: auto; 
+    font-family: "Zen Kaku Gothic new", sans-serif;
+    overflow: visible;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .card-img {
+    display: block;
+    width: auto;
+    height: auto;
+    max-width: 300px; /* 最大幅は制限 */
+    max-height: 450px; /* 最大高さも制限 */
   }
 
   .card-content {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
     display: flex;
     flex-direction: column;
-    height: 100%;
+    justify-content: center;
+    align-items: center;
+    padding: 1.5rem;
+    box-sizing: border-box;
+    text-align: center;
   }
 
   .card-header {
     width: 100%;
     text-align: center;
-    padding: 2rem 1rem;
-    flex-grow: 0;
+    margin-top: 0;
   }
 
   .card-subtitle {
-    font-size: 1rem;
-    margin: 0 0 1rem 0;
+    font-size: 0.7rem;
+    margin: 0 0 0.5rem 0;
     font-weight: normal;
-    color: #333;
+    color: #000;
   }
 
   .card-name {
-    font-size: 2.5rem;
-    margin: 0.5rem 0;
-    font-weight: bold;
+    font-size: 2.0rem;
+    margin: 0.5rem auto;
     letter-spacing: 0.1em;
     color: #000;
+    line-height: 1.2;
+    text-align: center;
   }
 
   .card-name-roman {
-    font-size: 1.2rem;
-    margin: 0.5rem 0;
+    font-size: 0.7rem;
+    margin: 0.5rem auto 0;
     letter-spacing: 0.1em;
-    color: #333;
+    color: #000;
+    text-align: center;
+    width: 100%;
+  }
+
+  .card-keyword-section {
+    text-align: center;
+    margin-top: 2rem;
+    margin-bottom: 0;
   }
 
   .keyword-label {
-    font-size: 1.2rem;
-    margin-bottom: 1rem;
-    color: #333;
+    font-size: 1.0rem;
+    color: #000;
+    letter-spacing: 0.1em;
+    margin-bottom: 0.5rem;
   }
 
   .keyword-tag {
-    font-size: 2rem;
-    font-weight: bold;
-    margin: 0;
+    font-size: 1.2rem;
+    font-family: "Zen Kaku Gothic new Bold", sans-serif;
+    margin: 0 auto;
     color: #000;
+    letter-spacing: 0.05em;
+    word-break: keep-all;
+    white-space: nowrap;
+    overflow: hidden;
+    text-align: center;
   }
 </style>

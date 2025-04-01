@@ -7,23 +7,29 @@ import '../styles/global.css'
 import BusinessCard from "../components/BusinessCard.astro"
 
 // メンバー情報を追加
-const projects = [
+let projects = [
 	{
-		name: "神山 まる子",
-		romaji: "KAMIYAMA MARUKO",
-		keyword: "entrepreneur"
+		name: "松井ひなこ",
+		romaji: "MATSUI HINAKO",
+		keyword: "パフェに甘えて"
 	},
 	{
-		name: "神山 まる美",
-		romaji: "KAMIYAMA MARUMI",
-		keyword: "designer"
+		name: "林美羽",
+		romaji: "HAYASHI MIU",
+		keyword: "わかめプロジェクト"
 	},
 	{
-		name: "神山 まる太",
-		romaji: "KAMIYAMA MARUTA",
-		keyword: "engineer"
+		name: "花火",
+		romaji: "HANABI",
+		keyword: "FRCロボコン"
 	}
 ];
+
+// プロジェクト配列をシャッフル
+for (let i = projects.length - 1; i > 0; i--) {
+	const j = Math.floor(Math.random() * (i + 1));
+	[projects[i], projects[j]] = [projects[j], projects[i]];
+}
 ---
 
 <Layout>
@@ -42,22 +48,33 @@ const projects = [
 			<h2>このプロジェクトは？</h2>
 			<p>ここでは、私たち神山まるごと高専生がARを通じて、神山まるごと高専の今を伝えるためのプロジェクトです。</p>
 			<p>目の前にあるマネキンにかざして、実際に神山まるごと高専の"今"を体験してみましょう。</p>
-			<a href="/ar" class="ar-button">次へ</a>
+			<button class="ar-button" id="toSelectPage">次へ</button>
 		</div>
 	</div>
 	<div class="movie_select-page" id="movieSelectPage">
 		<div class="movie-select-content">
-			<h2 class="page-title">メンバー紹介</h2>
-			<div class="member-content">
-				<div class="card-container">
-					<BusinessCard
-						name={projects[0].name}
-						romaji={projects[0].romaji}
-						keyword={projects[0].keyword}
-					/>
+			<h2 class="page-title">プロジェクト紹介</h2>
+			<div class="card-slider-container">
+				<button class="slider-button prev" id="prevCard">＜</button>
+				<div class="card-slider" id="cardSlider">
+					{projects.map((project, index) => (
+						<div class="card-slide" data-index={index}>
+							<BusinessCard
+								name={project.name}
+								romaji={project.romaji}
+								keyword={project.keyword}
+							/>
+						</div>
+					))}
 				</div>
+				<button class="slider-button next" id="nextCard">＞</button>
 			</div>
-			<button class="select-button">Select</button>
+			<div class="pagination-dots" id="paginationDots">
+				{projects.map((_, index) => (
+					<span class="dot" data-index={index}></span>
+				))}
+			</div>
+			<button class="select-button" id="selectButton">選択する</button>
 		</div>
 	</div>
 </Layout>
@@ -187,9 +204,11 @@ const projects = [
 		justify-content: center;
 		align-items: center;
 		z-index: 0;
-		background-color: transparent;
 		opacity: 0;
-		transition: opacity 1.5s ease;
+		visibility: hidden;
+		transition: opacity 1s ease, visibility 1s;
+		background-color: rgba(0, 0, 0, 0.2);
+		backdrop-filter: blur(5px);
 	}
 	
 	.explain-content {
@@ -201,6 +220,7 @@ const projects = [
 		-webkit-backdrop-filter: blur(10px);
 		border-radius: 15px;
 		color: var(--text-color-white);
+		font-family: var(--default-font);
 	}
 	
 	.explain-content h2 {
@@ -233,15 +253,15 @@ const projects = [
 	}
 	
 	.fade-out {
-		opacity: 0;
-		z-index: 0;
-		pointer-events: none;
+		opacity: 0 !important;
+		visibility: hidden !important;
+		z-index: 0 !important;
 	}
 	
 	.fade-in {
-		opacity: 1;
-		z-index: 2;
-		pointer-events: all;
+		opacity: 1 !important;
+		visibility: visible !important;
+		z-index: 3 !important;
 	}
 	
 	@media (max-width: 480px) {
@@ -287,54 +307,154 @@ const projects = [
 		align-items: center;
 		z-index: 0;
 		opacity: 0;
-		transition: opacity 1.5s ease;
-		background: linear-gradient(45deg, #2B4798, #4A7CE0, #1C52B7, #6A9DFF);
+		visibility: hidden;
+		transition: opacity 1s ease, visibility 1s;
+		background-color: rgba(19, 21, 26, 0.2);
 	}
 
 	.movie-select-content {
-		text-align: center;
-		padding: 2rem;
-		width: 90%;
-		max-width: 1200px;
-		border-radius: 15px;
-		color: white;
+		width: 100%;
+		max-width: 100%;
+		height: 100%;
 		display: flex;
 		flex-direction: column;
+		justify-content: center;
 		align-items: center;
+		text-align: center;
+		padding: 1rem;
+		color: var(--text-color-white);
 	}
 
 	.page-title {
 		font-size: 2rem;
-		margin-bottom: 2rem;
+		margin-bottom: 1rem;
+		font-family: var(--default-font);
 		color: white;
 	}
 
-	.member-content {
+	.card-slider-container {
+		position: relative;
 		width: 100%;
-		margin-bottom: 1rem;
-		padding: 1rem;
 		display: flex;
 		justify-content: center;
+		align-items: center;
 	}
 
-	.card-container {
+	.card-slider {
+		width: auto;
+		position: relative;
+		height: auto;
+		min-height: 450px;
+		margin: 0 auto;
+	}
+
+	.card-slide {
+		position: absolute;
 		width: 100%;
-		max-width: 350px;
+		height: 100%;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		transition: transform 0.8s ease, opacity 0.8s ease;
+		opacity: 0;
+		transform: scale(0.9);
+		pointer-events: none;
+	}
+
+	.card-slide.active {
+		opacity: 1;
+		transform: scale(1);
+		z-index: 2;
+		pointer-events: auto;
+	}
+
+	.card-slide.prev {
+		opacity: 0;
+		transform: scale(0.8) translateX(-30px);
+		z-index: 1;
+	}
+
+	.card-slide.next {
+		opacity: 0;
+		transform: scale(0.8) translateX(30px);
+		z-index: 1;
+	}
+
+	.slider-button {
+		position: absolute;
+		top: 50%;
+		transform: translateY(-50%);
+		z-index: 10;
+		background-color: rgba(255, 255, 255, 0.7);
+		border: none;
+		border-radius: 50%;
+		width: 36px;
+		height: 36px;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		cursor: pointer;
+		font-size: 1.2rem;
+		color: #2B4798;
+	}
+
+	.prev {
+		left: 10px;
+	}
+
+	.next {
+		right: 10px;
+	}
+
+	.pagination-dots {
+		display: flex;
+		justify-content: center;
+		margin: 1rem 0;
+	}
+
+	.dot {
+		width: 12px;
+		height: 12px;
+		background-color: rgba(255, 255, 255, 0.3);
+		border-radius: 50%;
+		margin: 0 8px;
+		cursor: pointer;
+		transition: background-color 0.3s;
+	}
+
+	.dot.active {
+		background-color: white;
 	}
 
 	.select-button {
+		font-family: var(--default-font);
+		background-color: var(--accent-color);
 		color: white;
 		border: none;
-		padding: 0.8rem 3rem;
-		font-size: 1.2rem;
-		border-radius: 10px;
+		padding: 0.8rem 2.5rem;
+		font-size: 1rem;
+		border-radius: 50px;
 		cursor: pointer;
 		transition: all 0.3s;
-		background-color: #3a7ca5;
-		margin-top: 2rem;
-		width: 90%;
-		max-width: 400px;
-		font-family: var(--default-font-english);
+		margin-top: 1.5rem;
+	}
+
+	.select-button:hover {
+		opacity: 0.9;
+		transform: scale(1.05);
+	}
+
+	/* トランジション用のクラス */
+	.fade-in {
+		opacity: 1 !important;
+		visibility: visible !important;
+		z-index: 10 !important;
+	}
+
+	.fade-out {
+		opacity: 0 !important;
+		visibility: hidden !important;
+		z-index: 0 !important;
 	}
 </style>
 
@@ -401,35 +521,132 @@ const projects = [
 		  "retina_detect": true
 		});
 
-		// ページ遷移の処理を追加
-		const startButton = document.getElementById('startButton');
+		// ページ切り替え用の要素
 		const landingPage = document.querySelector('.landing-page');
 		const explainPage = document.getElementById('explainPage');
 		const movieSelectPage = document.getElementById('movieSelectPage');
-		const nextButton = document.querySelector('.ar-button');
-
-		if (startButton && landingPage && explainPage) {
+		
+		// ボタン要素
+		const startButton = document.getElementById('startButton');
+		const arButton = document.querySelector('.ar-button');
+		const prevButton = document.getElementById('prevCard');
+		const nextButton = document.getElementById('nextCard');
+		const selectButton = document.getElementById('selectButton');
+		
+		// スライダー関連の要素
+		const cardSlides = document.querySelectorAll('.card-slide');
+		const dots = document.querySelectorAll('.dot');
+		
+		// 現在のカードインデックス
+		let currentIndex = 0;
+		
+		console.log("初期化中:", { 
+			slides: cardSlides.length, 
+			dots: dots.length, 
+			prevButton, 
+			nextButton 
+		});
+		
+		// 最初のスライドをアクティブに
+		if (cardSlides.length > 0) {
+			cardSlides[0].classList.add('active');
+			if (dots.length > 0) {
+				dots[0].classList.add('active');
+			}
+		}
+		
+		// ページ1からページ2への遷移
+		if (startButton) {
 			startButton.addEventListener('click', function() {
+				console.log("スタートボタンがクリックされました");
 				landingPage.classList.add('fade-out');
-				setTimeout(() => {
-					explainPage.classList.add('fade-in');
-				}, 500);
+				explainPage.classList.add('fade-in');
 			});
 		}
-
-		if (nextButton && explainPage && movieSelectPage) {
-			nextButton.addEventListener('click', function(e) {
+		
+		// ページ2からページ3（カード選択）への遷移
+		if (arButton) {
+			arButton.addEventListener('click', function(e) {
 				e.preventDefault();
+				console.log("次へボタンがクリックされました");
 				explainPage.classList.remove('fade-in');
 				explainPage.classList.add('fade-out');
-				setTimeout(() => {
-					movieSelectPage.style.opacity = '1';
-					movieSelectPage.style.zIndex = '2';
-					movieSelectPage.classList.add('fade-in');
-				}, 500);
+				movieSelectPage.classList.add('fade-in');
+				
+				// カードスライドの初期化
+				updateSlides();
 			});
 		}
-
-		// カードスクロール関連の処理をすべて削除
+		
+		// 前のカードへ移動
+		if (prevButton) {
+			prevButton.addEventListener('click', function() {
+				console.log("前へボタンがクリックされました");
+				if (currentIndex > 0) {
+					currentIndex--;
+					updateSlides();
+				}
+			});
+		}
+		
+		// 次のカードへ移動
+		if (nextButton) {
+			nextButton.addEventListener('click', function() {
+				console.log("次へボタンがクリックされました");
+				if (currentIndex < cardSlides.length - 1) {
+					currentIndex++;
+					updateSlides();
+				}
+			});
+		}
+		
+		// ドットをクリックして特定のカードへ移動
+		dots.forEach((dot, index) => {
+			dot.addEventListener('click', function() {
+				currentIndex = index;
+				updateSlides();
+			});
+		});
+		
+		// スライドの状態を更新
+		function updateSlides() {
+			console.log("スライド更新:", currentIndex);
+			
+			cardSlides.forEach((slide, index) => {
+				// すべてのクラスをリセット
+				slide.classList.remove('active', 'prev', 'next');
+				
+				// アニメーションのタイミングを少しずらす
+				setTimeout(() => {
+					if (index === currentIndex) {
+						slide.classList.add('active');
+					} else if (index < currentIndex) {
+						slide.classList.add('prev');
+					} else {
+						slide.classList.add('next');
+					}
+				}, 50);
+			});
+			
+			// ドットの状態も更新
+			dots.forEach((dot, index) => {
+				if (index === currentIndex) {
+					dot.classList.add('active');
+				} else {
+					dot.classList.remove('active');
+				}
+			});
+		}
+		
+		// 選択ボタンの処理
+		if (selectButton) {
+			selectButton.addEventListener('click', function() {
+				console.log("選択ボタンがクリックされました");
+				// 選択されたプロジェクトのインデックスをセッションストレージに保存
+				sessionStorage.setItem('selectedProject', currentIndex);
+				// AR画面へ遷移
+				window.location.href = "/ar";
+			});
+		}
 	};
 </script>
