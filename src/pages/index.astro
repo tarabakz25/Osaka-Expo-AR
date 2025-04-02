@@ -5,6 +5,7 @@ import KamiyamaLogo from "../assets/Kamiyama_Logo.svg"
 import '../styles/global.css'
 
 import BusinessCard from "../components/BusinessCard.astro"
+import { projects } from '../data/projects.js'
 
 // メンバー情報を追加
 let projects = [
@@ -318,7 +319,8 @@ for (let i = projects.length - 1; i > 0; i--) {
 		height: 100%;
 		display: flex;
 		flex-direction: column;
-		justify-content: center;
+		justify-content: flex-start;
+		padding-top: 5vh;
 		align-items: center;
 		text-align: center;
 		padding: 1rem;
@@ -327,6 +329,7 @@ for (let i = projects.length - 1; i > 0; i--) {
 
 	.page-title {
 		font-size: 2rem;
+		margin-top: 5rem;
 		margin-bottom: 1rem;
 		font-family: var(--default-font);
 		color: white;
@@ -409,7 +412,7 @@ for (let i = projects.length - 1; i > 0; i--) {
 	.pagination-dots {
 		display: flex;
 		justify-content: center;
-		margin: 1rem 0;
+		margin: 0.5rem 0;
 	}
 
 	.dot {
@@ -436,7 +439,7 @@ for (let i = projects.length - 1; i > 0; i--) {
 		border-radius: 50px;
 		cursor: pointer;
 		transition: all 0.3s;
-		margin-top: 1.5rem;
+		margin-top: 0.75rem;
 	}
 
 	.select-button:hover {
