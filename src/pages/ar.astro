@@ -1,226 +1,262 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import Fukidashi from '/Fukidashi.glb?url';
-import { projects } from '../data/projects.js';
 ---
 
 <Layout>
-    <!-- document.writeを使わず、直接スクリプトタグを使用 -->
-    <script is:inline src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
-    <script is:inline src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.3/dist/mindar-image-aframe.prod.js"></script>
+  <div class="ar-container">
+    <div id="overlay" class="overlay"></div>
+    <div id="message" class="message"></div>
+    <div id="ar-instruction" class="ar-instruction">マーカーをカメラにかざしてください</div>
     
-    <!-- Three.jsのインポートもここに移動 -->
-    <script is:inline src="https://unpkg.com/three@0.147.0/build/three.min.js"></script>
-    
-    <div class="arjs-loader" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.8); z-index: 9999; display: flex; justify-content: center; align-items: center;">
-        <div style="color: white; font-size: 1.5em;">カメラとARの読み込み中...</div>
+    <div id="survey" class="survey hidden">
+      <h3>アンケート</h3>
+      <p>このプロジェクトはいかがでしたか？</p>
+      <div class="survey-options">
+        <button class="survey-btn" data-rating="good">👍 良かった</button>
+        <button class="survey-btn" data-rating="neutral">😐 普通</button>
+        <button class="survey-btn" data-rating="bad">👎 改善が必要</button>
+      </div>
+      <button id="back-btn" class="back-btn">戻る</button>
     </div>
     
-    <!-- デバッグ表示用の要素 -->
-    <div id="debug-overlay" style="position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background-color: rgba(0,0,0,0.7); color: white; padding: 10px 20px; border-radius: 5px; z-index: 1000; display: none;">
-        マーカーを検出しました
-    </div>
+    <!-- A-FrameとAR.jsのスクリプト読み込み順序を修正 -->
+    <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
+    <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
     
-    <!-- 動画再生コンポーネント -->
-    <script is:inline>
-      document.addEventListener('DOMContentLoaded', function() {
-        if (window.AFRAME) {
-          console.log('A-Frameが読み込まれました、コンポーネントを登録します');
-          
-          // 動画再生コンポーネントのみ登録
-          AFRAME.registerComponent('play-on-marker', {
-            init: function () {
-              const marker = this.el.closest('[mindar-image-target]');
-              const video = document.querySelector('#project-video');
-              
-              if (marker && video) {
-                marker.addEventListener('targetFound', function () {
-                  console.log('マーカーを検出しました！動画を再生します');
-                  video.muted = true;
-                  video.play().catch(e => {
-                    console.error('動画の再生に失敗しました:', e);
-                  });
-                });
-              }
-            }
-          });
-          
-          console.log('コンポーネントが登録されました');
-        } else {
-          console.error('A-Frameが読み込まれていません');
-        }
-      });
-    </script>
-    
-    <!-- シーンの定義 -->
-    <a-scene
-        id="ar-scene"
-        vr-mode-ui="enabled: false"
-        mindar-image="imageTargetSrc: /targets.mind; autoStart: false;"
-        embedded
-        color-space="sRGB"
-        renderer="colorManagement: true; physicallyCorrectLights: true; antialias: true;"
-        loading-screen="enabled: false"
-        style="display: none;">
-        
-        <a-assets>
-            <a-asset-item id="fukidashi-model" src={Fukidashi} response-type="arraybuffer" crossorigin="anonymous"></a-asset-item>
-            <!-- 動画ソースは空で定義し、後からJavaScriptで設定 -->
-            <video id="project-video" preload="auto" loop="true" muted crossorigin="anonymous" playsinline webkit-playsinline></video>
-        </a-assets>
-        
-        <!-- カメラ設定 -->
-        <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
-        
-        <a-entity mindar-image-target="targetIndex: 0">
-            <!-- 吹き出しモデル -->
-            <a-entity 
-                gltf-model="#fukidashi-model"
-                scale="2 2 2" 
-                position="0 0 0"
-                rotation="0 90 -90">
-            </a-entity>
-            
-            <!-- 動画を表示するプレーン -->
-            <a-plane 
-                material="shader: flat; src: #project-video; transparent: true" 
-                scale="4 3.2 3" 
-                position="0 0.5 0" 
-                rotation="-90 0 0"
-                play-on-marker>
-            </a-plane>
-
-            <!-- 動画テキストの表示 - 後からJavaScriptで更新 -->
-            <a-text 
-                id="project-text"
-                value="読み込み中..." 
-                position="0 0.5 0" 
-                scale="0.5 0.5 0.5" 
-                color="#fff" 
-                align="center">
-            </a-text>
+    <!-- AR.jsシーン - NFTマーカーの代わりに標準マーカーを使用 -->
+    <a-scene embedded arjs="trackingMethod: best; sourceType: webcam; debugUIEnabled: false;">
+      <!-- アセット管理の追加 -->
+      <a-assets>
+        <a-asset-item id="fukidashi-asset" src={Fukidashi}></a-asset-item>
+        <video id="project-video" autoplay muted crossorigin="anonymous"></video>
+      </a-assets>
+      
+      <!-- 標準マーカーを使用 -->
+      <a-marker id="ar-marker" preset="hiro">
+        <!-- マーカー上に表示される3Dモデル（吹き出し） -->
+        <a-entity
+          id="fukidashi-model"
+          gltf-model="#fukidashi-asset"
+          scale="0.5 0.5 0.5"
+          position="0 0.5 0"
+          rotation="0 0 0"
+          visible="false">
         </a-entity>
+        
+        <!-- 動画プレーヤー -->
+        <a-video
+          id="video-player"
+          src="#project-video"
+          width="1.6"
+          height="0.9"
+          position="0 1.5 0"
+          rotation="-90 0 0"
+          visible="false">
+        </a-video>
+        
+        <!-- テキスト表示エリア -->
+        <a-entity
+          id="text-container"
+          position="0 0.8 0"
+          text="align: center; width: 2; color: #ffffff; value: プロジェクト情報がここに表示されます"
+          visible="false">
+        </a-entity>
+      </a-marker>
+      
+      <!-- カメラ -->
+      <a-entity camera></a-entity>
     </a-scene>
-    
-    <!-- プロジェクトデータをクライアントサイドに渡す -->
-    <script define:vars={{ projects }}>
-        // プロジェクト情報をグローバル変数として定義
-        window.projectsData = projects;
-        
-        document.addEventListener('DOMContentLoaded', function() {
-            // セッションストレージから選択されたプロジェクト情報を取得
-            const selectedIndex = sessionStorage.getItem('selectedProject') || 0;
-            const project = window.projectsData[selectedIndex];
-            
-            // プロジェクトのコンテンツをロード
-            if (project) {
-                // テキストをロード
-                fetch(`/items/${project.dir}/text.txt`)
-                    .then(response => response.text())
-                    .then(text => {
-                        document.getElementById('project-text').setAttribute('value', text.split(' - ')[0] || text);
-                    })
-                    .catch(error => console.error('テキスト読み込みエラー:', error));
-                
-                // 動画をロード
-                document.getElementById('project-video').src = `/items/${project.dir}/movie.mp4`;
-            }
-            
-            // 自動でARを起動
-            startAR();
-        });
-    </script>
-    
-    <!-- カメラとARの初期化用スクリプト -->
-    <script is:inline>
-        // ARを開始する関数をグローバルに定義
-        function startAR() {
-            console.log('ARの起動を試みます');
-            
-            const loader = document.querySelector('.arjs-loader');
-            const aScene = document.querySelector('a-scene');
-            
-            // カメラ権限を要求
-            navigator.mediaDevices.getUserMedia({ 
-                video: true, 
-                audio: false 
-            })
-            .then(function(stream) {
-                console.log('カメラへのアクセスが許可されました');
-                
-                // ストリームを停止
-                stream.getTracks().forEach(track => track.stop());
-                
-                try {
-                    if (aScene) {
-                        // シーンを表示
-                        aScene.style.display = 'block';
-                        
-                        // A-Frameシーンが完全に読み込まれているか確認
-                        if (aScene.hasLoaded) {
-                            startMindAR();
-                        } else {
-                            aScene.addEventListener('loaded', startMindAR);
-                        }
-                    } else {
-                        throw new Error('A-Sceneが見つかりません');
-                    }
-                } catch (error) {
-                    console.error('ARの初期化エラー:', error);
-                    alert('ARの初期化中にエラーが発生しました。ページを再読み込みしてください。');
-                    if (loader) loader.style.display = 'none';
-                }
-            })
-            .catch(function(err) {
-                console.error('カメラへのアクセスが拒否されました:', err);
-                alert('ARを使用するにはカメラへのアクセスを許可してください');
-                if (loader) {
-                    loader.innerHTML = 'カメラへのアクセスが拒否されました。<br>ページを再読み込みして、再度許可してください。<br><button onclick="location.reload()" style="margin-top: 20px; padding: 10px 20px; font-size: 1rem; background: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer;">再読み込み</button>';
-                }
-            });
+  </div>
+
+  <script>
+    // ページ読み込み完了後に実行
+    window.addEventListener('load', () => {
+      // 要素の取得
+      const marker = document.getElementById('ar-marker');
+      const fukidashiModel = document.getElementById('fukidashi-model');
+      const videoPlayer = document.getElementById('video-player');
+      const textContainer = document.getElementById('text-container');
+      const overlay = document.getElementById('overlay');
+      const message = document.getElementById('message');
+      const instruction = document.getElementById('ar-instruction');
+      const survey = document.getElementById('survey');
+      const backBtn = document.getElementById('back-btn');
+      const projectVideo = document.getElementById('project-video');
+      
+      // URLパラメータからプロジェクトIDを取得
+      const urlParams = new URLSearchParams(window.location.search);
+      const projectId = urlParams.get('project') || 'default';
+      
+      // セッションストレージからプロジェクトインデックスを取得
+      const storedIndex = sessionStorage.getItem('selectedProject');
+      const projectIndex = storedIndex ? parseInt(storedIndex) : 0;
+      
+      // プロジェクト情報（実際のデータに置き換える）
+      const projectData = {
+        default: {
+          videoUrl: '/videos/default.mp4',
+          description: 'デフォルトプロジェクトの説明文'
         }
+        // 他のプロジェクト情報を追加
+      };
+
+      // マーカーが検出されたときの処理
+      marker.addEventListener('markerFound', () => {
+        // 説明を非表示
+        instruction.style.display = 'none';
         
-        // MindARを起動する関数
-        function startMindAR() {
-            console.log('MindARを起動します');
-            
-            const loader = document.querySelector('.arjs-loader');
-            const aScene = document.querySelector('a-scene');
-            
-            const sceneSystem = aScene.systems["mindar-image-system"];
-            if (!sceneSystem) {
-                console.error('MindARシステムが見つかりません');
-                alert('ARシステムが見つかりませんでした。別のブラウザをお試しください。');
-                if (loader) loader.style.display = 'none';
-                return;
-            }
-            
-            console.log('MindARシステムが見つかりました、起動します');
-            
-            // MindARを開始
-            sceneSystem.start()
-            .then(() => {
-                console.log('MindARの起動に成功しました');
-                if (loader) loader.style.display = 'none';
-            })
-            .catch(e => {
-                console.error('MindARの起動エラー:', e);
-                alert('カメラの起動に失敗しました。ページを再読み込みして再試行してください。');
-                if (loader) loader.style.display = 'none';
-            });
-        }
+        // プロジェクト情報を取得
+        const project = projectData[projectId] || projectData.default;
         
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('DOM読み込み完了、AR初期化を開始します');
-            
-            // タイムアウト処理
-            setTimeout(() => {
-                const loader = document.querySelector('.arjs-loader');
-                if (loader && loader.style.display !== 'none') {
-                    console.log('タイムアウト: ローダーを非表示にします');
-                    loader.style.display = 'none';
-                }
-            }, 15000);
+        // テキストを設定
+        textContainer.setAttribute('text', `align: center; width: 2; color: #ffffff; value: ${project.description}`);
+        
+        // 動画を設定
+        projectVideo.src = project.videoUrl;
+        projectVideo.load();
+        projectVideo.play();
+        
+        // 要素を表示
+        fukidashiModel.setAttribute('visible', 'true');
+        textContainer.setAttribute('visible', 'true');
+        videoPlayer.setAttribute('visible', 'true');
+        
+        // 動画終了時にアンケートを表示
+        projectVideo.addEventListener('ended', () => {
+          overlay.style.opacity = '1';
+          survey.classList.remove('hidden');
         });
-    </script>
+      });
+      
+      // マーカーを見失ったときの処理
+      marker.addEventListener('markerLost', () => {
+        // 説明を再表示
+        instruction.style.display = 'block';
+        
+        // 要素を非表示
+        fukidashiModel.setAttribute('visible', 'false');
+        textContainer.setAttribute('visible', 'false');
+        videoPlayer.setAttribute('visible', 'false');
+      });
+      
+      // アンケートボタンのイベント処理
+      document.querySelectorAll('.survey-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const rating = btn.dataset.rating;
+          // ここでアンケート結果を保存する処理を追加（例：APIリクエスト）
+          
+          // メッセージ表示
+          message.textContent = 'ご回答ありがとうございました！';
+          message.style.opacity = '1';
+          
+          // 非表示にする
+          survey.classList.add('hidden');
+          
+          // 数秒後にメッセージを消す
+          setTimeout(() => {
+            message.style.opacity = '0';
+            overlay.style.opacity = '0';
+          }, 3000);
+        });
+      });
+      
+      // 戻るボタン
+      backBtn.addEventListener('click', () => {
+        survey.classList.add('hidden');
+        overlay.style.opacity = '0';
+      });
+    });
+  </script>
 </Layout>
+
+<style>
+  .ar-container {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    overflow: hidden;
+  }
+  
+  .overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 10;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+  }
+  
+  .message {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: rgba(255, 255, 255, 0.8);
+    color: #000;
+    padding: 20px;
+    border-radius: 10px;
+    z-index: 11;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+  }
+  
+  .ar-instruction {
+    position: fixed;
+    top: 20px;
+    left: 0;
+    width: 100%;
+    text-align: center;
+    color: white;
+    background-color: rgba(0, 0, 0, 0.6);
+    padding: 10px;
+    z-index: 5;
+  }
+  
+  .survey {
+    position: fixed;
+    bottom: 50px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: rgba(255, 255, 255, 0.9);
+    color: #000;
+    padding: 20px;
+    border-radius: 10px;
+    z-index: 20;
+    text-align: center;
+    width: 80%;
+    max-width: 400px;
+    transition: opacity 0.5s ease;
+  }
+  
+  .survey-options {
+    display: flex;
+    justify-content: space-around;
+    margin: 20px 0;
+  }
+  
+  .survey-btn {
+    padding: 10px 15px;
+    background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .back-btn {
+    padding: 10px 20px;
+    background-color: #e74c3c;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .hidden {
+    display: none !important;
+  }
+</style>
