@@ -5,23 +5,28 @@ import '../styles/global.css';
 ---
 
 <Layout>
+    <div id="particles-js" class="particles-container"></div>
     <div class="message-container">
-        <h1 class="message-title">プロジェクトへのメッセージ</h1>
-        
-        <div id="projectInfo" class="project-info">
-            <h2 id="projectName">プロジェクト名</h2>
-            <p id="projectKeyword">キーワード</p>
-        </div>
+        <h2 class="message-title">ご視聴ありがとうございました！良ければ、今見た動画の学生にメッセージをお願いいたします。</h2>
         
         <form id="messageForm" class="message-form">
             <div class="form-group">
                 <label for="name">お名前（任意）</label>
-                <input type="text" id="name" name="name" class="form-input">
+                <input type="text" id="name" name="name" class="form-input" placeholder="お名前を入力">
             </div>
             
+            <div class="form-project-name">
+                <label for="projectName">見たプロジェクト</label>
+                <select id="projectName" name="projectName" class="form-select" required>
+                    <option value="" disabled selected>プロジェクトを選択してください</option>
+                    {projects.map((project, index) => (
+                        <option value={index}>{project.name} - {project.keyword}</option>
+                    ))}
+                </select>
+            </div>
             <div class="form-group">
                 <label for="message">メッセージ</label>
-                <textarea id="message" name="message" rows="5" required class="form-textarea"></textarea>
+                <textarea id="message" name="message" rows="5" required class="form-textarea" placeholder="メッセージを入力"></textarea>
             </div>
             
             <div class="form-actions">
@@ -38,23 +43,103 @@ import '../styles/global.css';
     </div>
 </Layout>
 
-<script define:vars={{ projects }}>
-    document.addEventListener('DOMContentLoaded', () => {
+<script is:inline src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+
+<script>
+    // まず必要なデータを取得
+    const projectsData = [
+        {
+            name: "松井ひなこ",
+            romaji: "MATSUI HINAKO",
+            keyword: "パフェに甘えて",
+            dir: "pafe"
+        },
+        {
+            name: "林美羽",
+            romaji: "HAYASHI MIU",
+            keyword: "わかめプロジェクト",
+            dir: "wakame"
+        },
+        {
+            name: "花火",
+            romaji: "HANABI",
+            keyword: "FRCロボコン",
+            dir: "hanabi"
+        }
+    ];
+    
+    window.onload = function() {
+        // パーティクルJS初期化
+        particlesJS("particles-js", {
+          "particles": {
+            "number": {
+              "value": 100,
+              "density": {
+                "enable": true,
+                "value_area": 800
+              }
+            },
+            "color": {
+              "value": "#A5DFFF"
+            },
+            "shape": {
+              "type": "circle",
+              "stroke": {
+                "width": 0,
+                "color": "#A5DFFF"
+              }
+            },
+            "opacity": {
+              "value": 0.8,
+              "random": true
+            },
+            "size": {
+              "value": 5,
+              "random": true
+            },
+            "line_linked": {
+              "enable": false,
+              "distance": 150,
+              "color": "#888888",
+              "opacity": 0.6,
+              "width": 1
+            },
+            "move": {
+              "enable": true,
+              "speed": 1,
+              "direction": "top",
+              "random": true,
+              "straight": false
+            }
+          },
+          "interactivity": {
+            "detect_on": "canvas",
+            "events": {
+              "onhover": {
+                "enable": true,
+                "mode": "repulse"
+              },
+              "onclick": {
+                "enable": true,
+                "mode": "push"
+              },
+              "resize": true
+            }
+          },
+          "retina_detect": true
+        });
+        
         // セッションストレージから選択されたプロジェクトを取得
         const selectedProjectIndex = sessionStorage.getItem('selectedProject');
-        const projectInfoElement = document.getElementById('projectInfo');
-        const projectNameElement = document.getElementById('projectName');
-        const projectKeywordElement = document.getElementById('projectKeyword');
+        const projectNameSelect = document.getElementById('projectName');
         const messageForm = document.getElementById('messageForm');
         const thankYouMessage = document.getElementById('thankYouMessage');
         
-        // プロジェクト情報をページに表示
-        if (selectedProjectIndex !== null && projects[selectedProjectIndex]) {
-            const project = projects[selectedProjectIndex];
-            projectNameElement.textContent = project.name;
-            projectKeywordElement.textContent = project.keyword;
-        } else {
-            projectInfoElement.innerHTML = '<p>プロジェクトが選択されていません。</p>';
+        console.log("選択されたプロジェクトインデックス:", selectedProjectIndex);
+        
+        // セッションストレージに保存されたプロジェクトがあれば、そのプロジェクトを選択状態にする
+        if (selectedProjectIndex !== null && projectsData[selectedProjectIndex]) {
+            projectNameSelect.value = selectedProjectIndex;
         }
         
         // フォーム送信イベントの処理
@@ -90,66 +175,117 @@ import '../styles/global.css';
                 alert('エラーが発生しました。もう一度お試しください。');
             }
         });
-    });
+    };
 </script>
 
 <style>
+    .particles-container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 1;
+        background: linear-gradient(45deg, #2B4798, #4A7CE0, #1C52B7, #6A9DFF);
+        background-size: 300% 300%;
+        animation: gradient 10s ease-in-out infinite alternate;
+    }
+    
+    @keyframes gradient {
+        0% { background-position: 0% 0%; }
+        25% { background-position: 50% 50%; }
+        50% { background-position: 100% 100%; }
+        75% { background-position: 50% 50%; }
+        100% { background-position: 0% 0%; }
+    }
+    
     .message-container {
-        max-width: 800px;
+        position: relative;
+        z-index: 2;
+        max-width: 600px;
         margin: 0 auto;
         padding: 2rem;
+        color: white;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 80vh;
     }
     
     .message-title {
         text-align: center;
         margin-bottom: 2rem;
+        font-size: 1.0rem;
+        backdrop-filter: blur(5px);
+        -webkit-backdrop-filter: blur(5px);
     }
-    
-    .project-info {
-        background-color: rgba(255, 255, 255, 0.1);
-        padding: 1rem;
-        border-radius: 0.5rem;
-        margin-bottom: 2rem;
-        text-align: center;
-    }
+
     
     .message-form {
-        background-color: rgba(255, 255, 255, 0.1);
-        padding: 2rem;
         border-radius: 0.5rem;
+        backdrop-filter: blur(5px);
+        -webkit-backdrop-filter: blur(5px);
+        width: 100%;
+        box-sizing: border-box;
+        margin: 0 auto;
     }
     
     .form-group {
         margin-bottom: 1.5rem;
+        text-align: center;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .form-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        text-align: center;
+        font-size: 1.1rem;
+        width: 100%;
+        color: #fff;
     }
     
     .form-input, .form-textarea {
         width: 100%;
+        max-width: 100%;
         padding: 0.75rem;
-        border-radius: 0.25rem;
-        border: 1px solid #ccc;
+        border-radius: 0.5rem;
+        border: 1px solid rgba(255, 255, 255, 0.3);
         font-size: 1rem;
-        background-color: rgba(255, 255, 255, 0.9);
+        background-color: rgba(255, 255, 255, 0.2);
+        color: white;
+        text-align: center;
+        box-sizing: border-box;
+        margin: 0 auto;
     }
     
     .form-textarea {
         resize: vertical;
+        min-height: 120px;
+        text-align: center;
     }
     
     .form-actions {
         display: flex;
-        justify-content: space-between;
+        justify-content: space-around;
         margin-top: 2rem;
+        width: 100%;
     }
     
     .submit-button, .back-button {
         padding: 0.75rem 1.5rem;
-        border-radius: 0.25rem;
+        border-radius: 2rem;
         border: none;
         font-size: 1rem;
         cursor: pointer;
         text-decoration: none;
         text-align: center;
+        min-width: 120px;
+        transition: all 0.3s ease;
     }
     
     .submit-button {
@@ -157,15 +293,78 @@ import '../styles/global.css';
         color: white;
     }
     
+    .submit-button:hover {
+        background-color: #3d9140;
+        transform: translateY(-2px);
+    }
+    
     .back-button {
-        background-color: #f0f0f0;
-        color: #333;
+        background-color: rgba(255, 255, 255, 0.2);
+        color: white;
+    }
+    
+    .back-button:hover {
+        background-color: rgba(255, 255, 255, 0.3);
+        transform: translateY(-2px);
     }
     
     .thank-you-message {
-        background-color: rgba(255, 255, 255, 0.1);
+        background-color: rgba(255, 255, 255, 0.15);
         padding: 2rem;
         border-radius: 0.5rem;
         text-align: center;
+        backdrop-filter: blur(5px);
+        -webkit-backdrop-filter: blur(5px);
+        width: 100%;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    
+    /* プレースホルダーテキストのスタイル */
+    ::placeholder {
+        color: rgba(255, 255, 255, 0.7);
+        opacity: 1;
+        text-align: center;
+    }
+    
+    .form-project-name {
+        margin-bottom: 1.5rem;
+        text-align: center;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .form-project-name label {
+        display: block;
+        margin-bottom: 0.5rem;
+        text-align: center;
+        font-size: 1.1rem;
+        color: white;
+    }
+    
+    .form-select {
+        width: 100%;
+        max-width: 100%;
+        padding: 0.75rem;
+        border-radius: 0.5rem;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        font-size: 1rem;
+        background-color: rgba(255, 255, 255, 0.2);
+        color: white;
+        text-align-last: center;  /* テキストを中央揃えにする */
+        box-sizing: border-box;
+        margin: 0 auto;
+        appearance: none;  /* ネイティブのドロップダウン矢印を非表示 */
+        background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e");
+        background-repeat: no-repeat;
+        background-position: right 0.75rem center;
+        background-size: 16px 12px;
+        cursor: pointer;
+    }
+    
+    .form-select option {
+        background-color: #4A7CE0;
+        color: white;
     }
 </style>
