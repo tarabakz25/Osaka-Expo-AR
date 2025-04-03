@@ -1,8 +1,10 @@
+import { saveMessage } from '../../db/messages.js';
+
 export async function post({ request }) {
   try {
     const data = await request.json();
     
-    // ここでデータの検証を行う
+    // データのバリデーション
     if (!data.message) {
       return new Response(JSON.stringify({
         success: false,
@@ -15,18 +17,30 @@ export async function post({ request }) {
       });
     }
     
-    // 実際のデータベース保存処理をここに実装
-    // 例: JSONファイルに保存する場合、データベース接続、Firebase等
+    if (data.projectName === undefined && data.projectIndex === undefined) {
+      return new Response(JSON.stringify({
+        success: false,
+        error: 'プロジェクト情報は必須です'
+      }), {
+        status: 400,
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+    }
     
-    // 簡易的な例として、サーバーのログにメッセージを出力
-    console.log('保存されたメッセージ:', data);
+    // タイムスタンプがない場合は追加
+    if (!data.timestamp) {
+      data.timestamp = new Date().toISOString();
+    }
     
-    // 本番環境では、実際のデータベースに保存する処理を実装してください
-    // 例: データベース接続、ファイル書き込み、外部APIなど
+    // SQLiteにメッセージを保存
+    const result = saveMessage(data);
     
     return new Response(JSON.stringify({
       success: true,
-      message: 'メッセージが保存されました'
+      message: 'メッセージが保存されました',
+      id: result.id
     }), {
       status: 200,
       headers: {

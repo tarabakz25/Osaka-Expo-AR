@@ -147,6 +147,8 @@ import '../styles/global.css';
             e.preventDefault();
             
             const formData = new FormData(messageForm);
+            const selectedProjectIndex = formData.get('projectName'); // selectから選択されたプロジェクトのインデックス
+            
             const data = {
                 projectIndex: selectedProjectIndex,
                 name: formData.get('name'),
@@ -168,7 +170,8 @@ import '../styles/global.css';
                     messageForm.style.display = 'none';
                     thankYouMessage.style.display = 'block';
                 } else {
-                    alert('メッセージの送信に失敗しました。もう一度お試しください。');
+                    const errorData = await response.json();
+                    alert(`メッセージの送信に失敗しました: ${errorData.error || '不明なエラー'}`);
                 }
             } catch (error) {
                 console.error('エラーが発生しました:', error);
