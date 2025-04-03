@@ -1,0 +1,171 @@
+---
+import Layout from "../layouts/Layout.astro";
+import { projects } from '../data/projects.js';
+import '../styles/global.css';
+---
+
+<Layout>
+    <div class="message-container">
+        <h1 class="message-title">プロジェクトへのメッセージ</h1>
+        
+        <div id="projectInfo" class="project-info">
+            <h2 id="projectName">プロジェクト名</h2>
+            <p id="projectKeyword">キーワード</p>
+        </div>
+        
+        <form id="messageForm" class="message-form">
+            <div class="form-group">
+                <label for="name">お名前（任意）</label>
+                <input type="text" id="name" name="name" class="form-input">
+            </div>
+            
+            <div class="form-group">
+                <label for="message">メッセージ</label>
+                <textarea id="message" name="message" rows="5" required class="form-textarea"></textarea>
+            </div>
+            
+            <div class="form-actions">
+                <button type="submit" class="submit-button">送信する</button>
+                <a href="/" class="back-button">トップに戻る</a>
+            </div>
+        </form>
+        
+        <div id="thankYouMessage" class="thank-you-message" style="display: none;">
+            <h2>メッセージを送信しました！</h2>
+            <p>ご参加いただきありがとうございます。</p>
+            <a href="/" class="back-button">トップに戻る</a>
+        </div>
+    </div>
+</Layout>
+
+<script define:vars={{ projects }}>
+    document.addEventListener('DOMContentLoaded', () => {
+        // セッションストレージから選択されたプロジェクトを取得
+        const selectedProjectIndex = sessionStorage.getItem('selectedProject');
+        const projectInfoElement = document.getElementById('projectInfo');
+        const projectNameElement = document.getElementById('projectName');
+        const projectKeywordElement = document.getElementById('projectKeyword');
+        const messageForm = document.getElementById('messageForm');
+        const thankYouMessage = document.getElementById('thankYouMessage');
+        
+        // プロジェクト情報をページに表示
+        if (selectedProjectIndex !== null && projects[selectedProjectIndex]) {
+            const project = projects[selectedProjectIndex];
+            projectNameElement.textContent = project.name;
+            projectKeywordElement.textContent = project.keyword;
+        } else {
+            projectInfoElement.innerHTML = '<p>プロジェクトが選択されていません。</p>';
+        }
+        
+        // フォーム送信イベントの処理
+        messageForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = new FormData(messageForm);
+            const data = {
+                projectIndex: selectedProjectIndex,
+                name: formData.get('name'),
+                message: formData.get('message'),
+                timestamp: new Date().toISOString()
+            };
+            
+            try {
+                const response = await fetch('/api/save-message', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                });
+                
+                if (response.ok) {
+                    // 送信成功メッセージを表示
+                    messageForm.style.display = 'none';
+                    thankYouMessage.style.display = 'block';
+                } else {
+                    alert('メッセージの送信に失敗しました。もう一度お試しください。');
+                }
+            } catch (error) {
+                console.error('エラーが発生しました:', error);
+                alert('エラーが発生しました。もう一度お試しください。');
+            }
+        });
+    });
+</script>
+
+<style>
+    .message-container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 2rem;
+    }
+    
+    .message-title {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+    
+    .project-info {
+        background-color: rgba(255, 255, 255, 0.1);
+        padding: 1rem;
+        border-radius: 0.5rem;
+        margin-bottom: 2rem;
+        text-align: center;
+    }
+    
+    .message-form {
+        background-color: rgba(255, 255, 255, 0.1);
+        padding: 2rem;
+        border-radius: 0.5rem;
+    }
+    
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+    
+    .form-input, .form-textarea {
+        width: 100%;
+        padding: 0.75rem;
+        border-radius: 0.25rem;
+        border: 1px solid #ccc;
+        font-size: 1rem;
+        background-color: rgba(255, 255, 255, 0.9);
+    }
+    
+    .form-textarea {
+        resize: vertical;
+    }
+    
+    .form-actions {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 2rem;
+    }
+    
+    .submit-button, .back-button {
+        padding: 0.75rem 1.5rem;
+        border-radius: 0.25rem;
+        border: none;
+        font-size: 1rem;
+        cursor: pointer;
+        text-decoration: none;
+        text-align: center;
+    }
+    
+    .submit-button {
+        background-color: #4caf50;
+        color: white;
+    }
+    
+    .back-button {
+        background-color: #f0f0f0;
+        color: #333;
+    }
+    
+    .thank-you-message {
+        background-color: rgba(255, 255, 255, 0.1);
+        padding: 2rem;
+        border-radius: 0.5rem;
+        text-align: center;
+    }
+</style>

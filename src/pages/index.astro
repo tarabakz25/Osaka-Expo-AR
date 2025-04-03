@@ -341,14 +341,17 @@ for (let i = projects.length - 1; i > 0; i--) {
 		flex-direction: column;
 		justify-content: center;
 		align-items: center;
+		touch-action: pan-y pinch-zoom;
 	}
 
 	.card-slider {
-		width: auto;
+		width: 100%;
 		position: relative;
 		height: auto;
 		min-height: 450px;
 		margin: 0 auto;
+		touch-action: pan-x;
+		user-select: none;
 	}
 
 	.card-slide {
@@ -358,10 +361,11 @@ for (let i = projects.length - 1; i > 0; i--) {
 		display: flex;
 		justify-content: center;
 		align-items: center;
-		transition: transform 0.8s ease, opacity 0.8s ease;
+		transition: transform 0.4s ease, opacity 0.4s ease;
 		opacity: 0;
 		transform: scale(0.9);
 		pointer-events: none;
+		will-change: transform, opacity;
 	}
 
 	.card-slide.active {
@@ -565,32 +569,37 @@ for (let i = projects.length - 1; i > 0; i--) {
 		// タッチ関連の変数
 		let touchStartX = 0;
 		let touchEndX = 0;
-		let touchStartTime = 0;
-		let touchEndTime = 0;
+		let isSwiping = false;
 		
 		// カードスライダーにタッチイベントを追加
 		if (cardSlider) {
 			cardSlider.addEventListener('touchstart', function(e) {
+				e.preventDefault();
 				touchStartX = e.changedTouches[0].screenX;
-				touchStartTime = new Date().getTime();
-			});
+				isSwiping = false;
+			}, { passive: false });
+			
+			cardSlider.addEventListener('touchmove', function(e) {
+				e.preventDefault();
+				const currentX = e.changedTouches[0].screenX;
+				const diffX = currentX - touchStartX;
+				
+				if (Math.abs(diffX) > 5) {
+					isSwiping = true;
+				}
+			}, { passive: false });
 			
 			cardSlider.addEventListener('touchend', function(e) {
+				e.preventDefault();
 				touchEndX = e.changedTouches[0].screenX;
-				touchEndTime = new Date().getTime();
+				const swipeDistance = touchEndX - touchStartX;
 				
-				// タップとスワイプを区別する
-				const touchDuration = touchEndTime - touchStartTime;
-				const touchDistance = Math.abs(touchEndX - touchStartX);
-				
-				if (touchDuration < 300 && touchDistance < 30) {
-					// タップと判断
-					handleCardTap();
+				if (isSwiping) {
+					handleSwipe(swipeDistance);
 				} else {
-					// スワイプと判断
-					handleSwipe();
+					handleCardTap();
 				}
-			});
+			}, { passive: false });
 		}
 		
 		// アクティブなカードをタップしたときの処理
@@ -611,19 +620,14 @@ for (let i = projects.length - 1; i > 0; i--) {
 			});
 		});
 		
-		// スワイプの処理
-		function handleSwipe() {
-			const swipeDistance = touchEndX - touchStartX;
-			const threshold = 50; // スワイプを検知する最小距離
-			
-			if (swipeDistance > threshold) {
-				// 右にスワイプ - 前のカードへ
+		// スワイプの処理をシンプルに
+		function handleSwipe(swipeDistance) {
+			if (swipeDistance > 30) { // 右スワイプ
 				if (currentIndex > 0) {
 					currentIndex--;
 					updateSlides();
 				}
-			} else if (swipeDistance < -threshold) {
-				// 左にスワイプ - 次のカードへ
+			} else if (swipeDistance < -30) { // 左スワイプ
 				if (currentIndex < cardSlides.length - 1) {
 					currentIndex++;
 					updateSlides();
@@ -704,19 +708,15 @@ for (let i = projects.length - 1; i > 0; i--) {
 			console.log("スライド更新:", currentIndex);
 			
 			cardSlides.forEach((slide, index) => {
-				// すべてのクラスをリセット
 				slide.classList.remove('active', 'prev', 'next');
 				
-				// アニメーションのタイミングを少しずらす
-				setTimeout(() => {
-					if (index === currentIndex) {
-						slide.classList.add('active');
-					} else if (index < currentIndex) {
-						slide.classList.add('prev');
-					} else {
-						slide.classList.add('next');
-					}
-				}, 50);
+				if (index === currentIndex) {
+					slide.classList.add('active');
+				} else if (index < currentIndex) {
+					slide.classList.add('prev');
+				} else {
+					slide.classList.add('next');
+				}
 			});
 			
 			// ドットの状態も更新
