@@ -198,14 +198,9 @@ import { projects } from '../data/projects.js';
                 <!-- マーカーが検出された位置に固定表示するためのエンティティを追加 -->
                 <a-entity id="fixed-content" visible="false"></a-entity>
     
-                <a-nft
-                    id="projectVideo"
-                    type="nft"
-                    url="nft/marker"
-                    smooth="true"
-                    smoothCount="10"
-                    smoothTolerance=".01"
-                    smoothThreshold="5">
+                <a-marker
+                    preset="hiro"
+                    id="hiroMarker">
                     <!-- マーカー上に直接コンテンツを配置 -->
                         <a-entity
                             id="fukidashiModel"
