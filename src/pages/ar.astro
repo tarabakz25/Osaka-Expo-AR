@@ -7,6 +7,7 @@ import { projects } from '../data/projects.js';
 <ARLayout>    
     <script is:inline src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
     <script is:inline src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
+    <script is:inline src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar-nft.js"></script>
     <script is:inline>
         // 水の粒子アニメーションを実装するためのコンポーネント
         AFRAME.registerComponent('water-particles', {
@@ -15,7 +16,7 @@ import { projects } from '../data/projects.js';
                 this.scene = this.el.sceneEl.object3D;
                 
                 // マーカーが検出されたら粒子を非表示にする
-                const marker = document.querySelector('a-marker');
+                const marker = document.querySelector('a-nft');
                 marker.addEventListener('markerFound', () => {
                     this.hideParticles();
                 });
@@ -176,6 +177,14 @@ import { projects } from '../data/projects.js';
             <div id="errorMessage" style="color: #ff6b6b;"></div>
         </div>
         
+        <!-- 動画再生後のお礼メッセージ -->
+        <div id="thankYouContainer" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 30; background-color: rgba(0, 0, 0, 0.8); color: white; padding: 2em; border-radius: 1em; text-align: center; max-width: 80%;">
+            <h2>ご視聴ありがとうございました！</h2>
+            <p>学生の作品はいかがでしたか？</p>
+            <p>良ければ、学生へのメッセージをお願いします。</p>
+            <a href="/message" id="messageButton" style="display: inline-block; margin-top: 1em; background-color: #4caf50; color: white; padding: 0.75rem 1.5rem; border-radius: 2rem; text-decoration: none; font-size: 1rem;">メッセージを送る</a>
+        </div>
+        
         <div id="arjs-scene">
             <a-scene
                 vr-mode-ui="enabled: false;"
@@ -188,9 +197,15 @@ import { projects } from '../data/projects.js';
                 
                 <!-- マーカーが検出された位置に固定表示するためのエンティティを追加 -->
                 <a-entity id="fixed-content" visible="false"></a-entity>
-                
-                <!-- hiroマーカーを使用 -->
-                <a-marker preset="hiro" id="hiroMarker">
+    
+                <a-nft
+                    id="projectVideo"
+                    type="nft"
+                    url="nft/marker"
+                    smooth="true"
+                    smoothCount="10"
+                    smoothTolerance=".01"
+                    smoothThreshold="5">
                     <!-- マーカー上に直接コンテンツを配置 -->
                         <a-entity
                             id="fukidashiModel"
@@ -207,19 +222,15 @@ import { projects } from '../data/projects.js';
                             text="value: テスト表示; align: center; width: 2; color: black;"
                             visible="true">
                         </a-entity>
-                        <a-video
-                            id="projectVideo"
-                            width="7"
-                            height="2"
-                            position="-3 -4 0"
-                            rotation="90 90 -90"
-                            autoplay
-                            muted
-                            playsinline
-                            visible="true">
-                        </a-video>
-                </a-marker>
-                
+                            <a-video
+                                width="7"
+                                height="2"
+                                autoplay
+                                muted
+                                playsinline>
+                            </a-video>
+                        </a-nft>
+                </a-nft>
                 <!-- カメラ -->
                 <a-entity camera></a-entity>
             </a-scene>
@@ -231,10 +242,11 @@ import { projects } from '../data/projects.js';
     // DOMが読み込まれたら実行
     document.addEventListener('DOMContentLoaded', () => {
         // ARマーカー関連の要素を取得
-        const marker = document.querySelector('a-marker');
+        const marker = document.querySelector('a-nft');
         const loadingMessage = document.getElementById('loadingMessage');
         const projectText = document.getElementById('projectText');
         const projectVideo = document.getElementById('projectVideo');
+        const thankYouContainer = document.getElementById('thankYouContainer');
         // 固定コンテンツの参照を無効化
         // const fixedContent = document.getElementById('fixed-content');
         
@@ -257,12 +269,21 @@ import { projects } from '../data/projects.js';
             errorMessage.textContent = '先に選択画面でプロジェクトを選んでください';
         }
         
+        // 動画再生完了フラグ
+        let videoCompleted = false;
+        
         // マーカーが検出されたときの処理
         marker.addEventListener('markerFound', () => {
-            console.log('hiroマーカーが検出されました');
+            console.log('NFTマーカーが検出されました');
             markerStatus.textContent = '検出中';
             markerStatus.style.color = '#66ff66';
             loadingMessage.style.display = 'none';
+            
+            // 既に動画再生が完了していたらお礼メッセージを表示
+            if (videoCompleted) {
+                thankYouContainer.style.display = 'block';
+                return;
+            }
             
             // マーカー検出デバッグ情報を追加
             errorMessage.textContent = 'マーカーを検出しました。マーカー上に直接表示します...';
@@ -305,6 +326,21 @@ import { projects } from '../data/projects.js';
                         const videoEl = projectVideo.components.material.material.map.image;
                         if (videoEl) {
                             videoEl.muted = true;
+                            
+                            // 動画再生終了イベントを追加
+                            videoEl.addEventListener('ended', () => {
+                                console.log('動画再生が完了しました');
+                                videoCompleted = true;
+                                
+                                // お礼メッセージを表示
+                                thankYouContainer.style.display = 'block';
+                                
+                                // 選択されたプロジェクトIDをメッセージページ用に保存
+                                if (selectedProjectIndex !== null) {
+                                    sessionStorage.setItem('messageProject', selectedProjectIndex);
+                                }
+                            });
+                            
                             videoEl.play().catch(e => {
                                 console.error('動画再生エラー:', e);
                                 errorMessage.textContent = `動画エラー: ${e.message}`;
@@ -320,13 +356,15 @@ import { projects } from '../data/projects.js';
         
         // マーカーを見失ったときの処理
         marker.addEventListener('markerLost', () => {
-            console.log('hiroマーカーを見失いました');
+            console.log('NFTマーカーを見失いました');
             markerStatus.textContent = '未検出';
             markerStatus.style.color = '#ffff66';
-            loadingMessage.style.display = 'block';
             
-            // 固定コンテンツ関連の処理を削除
-            errorMessage.textContent = 'マーカーを見失いました。再度マーカーを探してください。';
+            // 動画再生完了後は、loadingMessageを表示しない
+            if (!videoCompleted) {
+                loadingMessage.style.display = 'block';
+                errorMessage.textContent = 'マーカーを見失いました。再度マーカーを探してください。';
+            }
         });
     });
 </script>
@@ -375,5 +413,23 @@ import { projects } from '../data/projects.js';
         width: 100%;
         height: 100%;
         z-index: 1;
+    }
+    
+    #messageButton {
+        display: inline-block;
+        background-color: #4caf50;
+        color: white;
+        padding: 0.75rem 1.5rem;
+        border-radius: 2rem;
+        text-decoration: none;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        border: none;
+        cursor: pointer;
+    }
+    
+    #messageButton:hover {
+        background-color: #3d9140;
+        transform: translateY(-2px);
     }
 </style>
