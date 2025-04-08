@@ -35,51 +35,31 @@ let projects = [
 
 <Layout>
 	<div id="particles-js" class="particles-container"></div>
+	<!-- 言語切り替えボタン -->
+	<div class="language-switcher">
+		<button id="langJa" class="lang-btn active">日本語</button>
+		<button id="langEn" class="lang-btn">English</button>
+	</div>
 	<div class="landing-page">
 		<div class="landing-content">
 			<div class="logo-container">
 				<Image src={KamiyamaLogo} alt="Kamiyama Logo" class="kamiyama-logo" />
 			</div>
-			<h1 class="welcome-title">大阪・関西万博徳島パビリオン 神山まるごと高専エリアへようこそ</h1>
+			<h1 class="welcome-title" id="welcomeTitle">大阪・関西万博徳島パビリオン 神山まるごと高専エリアへようこそ</h1>
 			<button class="start-button" id="startButton">次へ</button>
 		</div>
 	</div>
 	<div class="explain_text-page" id="explainPage">
 		<div class="explain-content">
-			<h2>このプロジェクトは？</h2>
-			<p>ここでは、私たち神山まるごと高専生がARを通じて、神山まるごと高専の今を伝えるためのプロジェクトです。</p>
-			<p>目の前にあるマネキンにかざして、実際に神山まるごと高専の"今"を体験してみましょう。</p>
+			<h2 id="explainTitle">このプロジェクトは？</h2>
+			<p id="explainText1">ここでは、私たち神山まるごと高専生がARを通じて、神山まるごと高専の今を伝えるためのプロジェクトです。</p>
+			<p id="explainText2">目の前にあるマネキンにかざして、実際に神山まるごと高専の"今"を体験してみましょう。</p>
 			<button class="ar-button" id="toSelectPage">次へ</button>
-		</div>
-	</div>
-	<div class="movie_select-page" id="movieSelectPage">
-		<div class="movie-select-content">
-			<h2 class="page-title">プロジェクト紹介</h2>
-			<div class="card-slider-container">
-				<div class="card-slider" id="cardSlider">
-					{projects.map((project, index) => (
-						<div class="card-slide" data-index={index}>
-							<BusinessCard
-								name={project.name}
-								romaji={project.romaji}
-								keyword={project.keyword}
-							/>
-						</div>
-					))}
-				</div>
-				<div class="swipe-hint">← スワイプでカードを切り替え →</div>
-			</div>
-			<div class="pagination-dots" id="paginationDots">
-				{projects.map((_, index) => (
-					<span class="dot" data-index={index}></span>
-				))}
-			</div>
-			<div class="tap-hint">カードをタップして選択</div>
 		</div>
 	</div>
 </Layout>
 
-<style>a
+<style>
 	body {
 		margin: 0;
 		padding: 0;
@@ -189,6 +169,39 @@ let projects = [
 		background-color: var(--accent-color);
 		opacity: 0.9;
 	}
+
+	/* 言語切り替えボタンのスタイル */
+	.language-switcher {
+		position: fixed;
+		top: 20px;
+		right: 20px;
+		z-index: 100;
+		display: flex;
+		border-radius: 25px;
+		overflow: hidden;
+		background-color: rgba(255, 255, 255, 0.2);
+		backdrop-filter: blur(5px);
+		-webkit-backdrop-filter: blur(5px);
+	}
+
+	.lang-btn {
+		padding: 8px 15px;
+		border: none;
+		background: transparent;
+		color: white;
+		cursor: pointer;
+		font-family: var(--default-font);
+		transition: background-color 0.3s;
+	}
+
+	.lang-btn.active {
+		background-color: rgba(255, 255, 255, 0.3);
+		font-weight: bold;
+	}
+
+	.lang-btn:hover {
+		background-color: rgba(255, 255, 255, 0.4);
+	}
 	
 	.hidden {
 		display: none !important;
@@ -200,41 +213,29 @@ let projects = [
 		left: 0;
 		width: 100%;
 		height: 100vh;
-		display: flex;
+		display: none;
 		justify-content: center;
 		align-items: center;
-		z-index: 0;
-		opacity: 0;
-		visibility: hidden;
-		transition: opacity 1s ease, visibility 1s;
-		background-color: rgba(0, 0, 0, 0.2);
-		backdrop-filter: blur(5px);
+		z-index: 3;
+		padding: 1rem;
+		box-sizing: border-box;
 	}
 	
 	.explain-content {
 		text-align: center;
-		padding: 2rem;
-		width: 90%;
+		width: 100%;
 		max-width: 600px;
+		background-color: rgba(255, 255, 255, 0.1);
 		backdrop-filter: blur(10px);
 		-webkit-backdrop-filter: blur(10px);
-		border-radius: 15px;
+		padding: 2rem;
+		border-radius: 1rem;
+		box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 		color: var(--text-color-white);
-		font-family: var(--default-font);
-	}
-	
-	.explain-content h2 {
-		font-size: 1.5rem;
-		margin-bottom: 1rem;
-	}
-	
-	.explain-content p {
-		margin-bottom: 1rem;
-		line-height: 1.6;
 	}
 	
 	.ar-button {
-		font-family: var(--default-font-english);
+		background-color: var(--accent-color);
 		color: white;
 		border: none;
 		padding: 0.8rem 2rem;
@@ -244,244 +245,112 @@ let projects = [
 		transition: all 0.3s;
 		display: inline-block;
 		text-decoration: none;
-		margin-top: 1rem;
-		background-color: var(--accent-color);
+		margin-top: 1.5rem;
 	}
 	
 	.ar-button:hover {
-		opacity: 0.9;
-	}
-	
-	.fade-out {
-		opacity: 0 !important;
-		visibility: hidden !important;
-		z-index: 0 !important;
-	}
-	
-	.fade-in {
-		opacity: 1 !important;
-		visibility: visible !important;
-		z-index: 3 !important;
-	}
-	
-	@media (max-width: 480px) {
-		.landing-content {
-			width: 85%;
-			padding: 0.5rem;
-		}
-		
-		.welcome-title {
-			font-size: 1.1rem;
-		}
-		
-		.landing-content .kamiyama-logo {
-			width: 100px;
-		}
-		
-		.start-button {
-			padding: 0.7rem 1.8rem;
-		}
-
-		.explain-content {
-			padding: 1.5rem;
-			width: 85%;
-		}
-
-		.explain-content h2 {
-			font-size: 1.3rem;
-		}
-
-		.explain-content p {
-			font-size: 0.9rem;
-		}
-	}
-
-	.movie_select-page {
-		position: fixed;
-		top: 0;
-		left: 0;
-		width: 100%;
-		height: 100vh;
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		z-index: 0;
-		opacity: 0;
-		visibility: hidden;
-		transition: opacity 1s ease, visibility 1s;
-		background-color: rgba(19, 21, 26, 0.2);
-	}
-
-	.movie-select-content {
-		width: 100%;
-		max-width: 100%;
-		height: 100%;
-		display: flex;
-		flex-direction: column;
-		justify-content: flex-start;
-		padding-top: 5vh;
-		align-items: center;
-		text-align: center;
-		padding: 1rem;
-		color: var(--text-color-white);
-	}
-
-	.page-title {
-		font-size: 2rem;
-		margin-top: 5rem;
-		margin-bottom: 1rem;
-		font-family: var(--default-font);
-		color: white;
-	}
-
-	.card-slider-container {
-		position: relative;
-		width: 100%;
-		display: flex;
-		flex-direction: column;
-		justify-content: center;
-		align-items: center;
-		touch-action: pan-y pinch-zoom;
-	}
-
-	.card-slider {
-		width: 100%;
-		position: relative;
-		height: auto;
-		min-height: 450px;
-		margin: 0 auto;
-		touch-action: pan-x;
-		user-select: none;
-	}
-
-	.card-slide {
-		position: absolute;
-		width: 100%;
-		height: 100%;
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		transition: transform 0.4s ease, opacity 0.4s ease;
-		opacity: 0;
-		transform: scale(0.9);
-		pointer-events: none;
-		will-change: transform, opacity;
-	}
-
-	.card-slide.active {
-		opacity: 1;
-		transform: scale(1);
-		z-index: 2;
-		pointer-events: auto;
-		cursor: pointer;
-		position: relative;
-	}
-
-	.card-slide.active::after {
-		content: '';
-		position: absolute;
-		top: 0;
-		left: 0;
-		right: 0;
-		bottom: 0;
-		border-radius: 10px;
-		box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
-		opacity: 0;
-		transition: opacity 0.3s ease;
-		pointer-events: none;
-	}
-
-	.card-slide.active:hover::after {
-		opacity: 1;
-	}
-
-	.card-slide.prev {
-		opacity: 0;
-		transform: scale(0.8) translateX(-30px);
-		z-index: 1;
-	}
-
-	.card-slide.next {
-		opacity: 0;
-		transform: scale(0.8) translateX(30px);
-		z-index: 1;
-	}
-
-	.swipe-hint {
-		margin-top: 15px;
-		font-size: 0.9rem;
-		color: rgba(255, 255, 255, 0.7);
-		font-family: var(--default-font);
-		text-align: center;
-		animation: pulse 2s infinite;
-	}
-	
-	@keyframes pulse {
-		0% { opacity: 0.5; }
-		50% { opacity: 1; }
-		100% { opacity: 0.5; }
-	}
-
-	.pagination-dots {
-		display: flex;
-		justify-content: center;
-		margin: 0.5rem 0;
-	}
-
-	.dot {
-		width: 12px;
-		height: 12px;
-		background-color: rgba(255, 255, 255, 0.3);
-		border-radius: 50%;
-		margin: 0 8px;
-		cursor: pointer;
-		transition: background-color 0.3s;
-	}
-
-	.dot.active {
-		background-color: white;
-	}
-
-	.select-button {
-		font-family: var(--default-font);
-		background-color: var(--accent-color);
-		color: white;
-		border: none;
-		padding: 0.8rem 2.5rem;
-		font-size: 1rem;
-		border-radius: 50px;
-		cursor: pointer;
-		transition: all 0.3s;
-		margin-top: 0.75rem;
-	}
-
-	.select-button:hover {
-		opacity: 0.9;
-		transform: scale(1.05);
-	}
-
-	/* トランジション用のクラス */
-	.fade-in {
-		opacity: 1 !important;
-		visibility: visible !important;
-		z-index: 10 !important;
-	}
-
-	.fade-out {
-		opacity: 0 !important;
-		visibility: hidden !important;
-		z-index: 0 !important;
-	}
-
-	.tap-hint {
-		margin-top: 20px;
-		font-size: 1rem;
-		color: white;
-		font-family: var(--default-font);
-		text-align: center;
-		animation: pulse 2s infinite;
+		background-color: var(--accent-color-dark);
 	}
 </style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    // 言語切り替え用のテキスト定義
+    const translations = {
+      ja: {
+        welcomeTitle: '大阪・関西万博徳島パビリオン 神山まるごと高専エリアへようこそ',
+        startButton: '次へ',
+        explainTitle: 'このプロジェクトは？',
+        explainText1: 'ここでは、私たち神山まるごと高専生がARを通じて、神山まるごと高専の今を伝えるためのプロジェクトです。',
+        explainText2: '目の前にあるマネキンにかざして、実際に神山まるごと高専の"今"を体験してみましょう。',
+        toSelectPage: '次へ'
+      },
+      en: {
+        welcomeTitle: 'Welcome to Kamiyama KOSEN Area, Tokushima Pavilion, Osaka-Kansai Expo',
+        startButton: 'Next',
+        explainTitle: 'About This Project',
+        explainText1: 'This is a project where we, students of Kamiyama KOSEN, share our current activities through AR technology.',
+        explainText2: 'Hold your device up to the mannequin in front of you to experience the current state of Kamiyama KOSEN.',
+        toSelectPage: 'Next'
+      }
+    };
+
+    // 言語切り替えボタンの要素を取得
+    const langJaBtn = document.getElementById('langJa');
+    const langEnBtn = document.getElementById('langEn');
+    
+    // ページ内の変更対象要素を取得
+    const welcomeTitle = document.getElementById('welcomeTitle');
+    const startBtn = document.getElementById('startButton');
+    const explainTitle = document.getElementById('explainTitle');
+    const explainText1 = document.getElementById('explainText1');
+    const explainText2 = document.getElementById('explainText2');
+    const toSelectPageBtn = document.getElementById('toSelectPage');
+    
+    // 言語を切り替える関数
+    function switchLanguage(lang) {
+      // nullチェック
+      if (!langJaBtn || !langEnBtn || !welcomeTitle || !startBtn || 
+          !explainTitle || !explainText1 || !explainText2 || !toSelectPageBtn) {
+        console.error('一部の要素が見つかりません');
+        return;
+      }
+      
+      // 言語ボタンのアクティブ状態を切り替え
+      if (lang === 'ja') {
+        langJaBtn.classList.add('active');
+        langEnBtn.classList.remove('active');
+      } else {
+        langJaBtn.classList.remove('active');
+        langEnBtn.classList.add('active');
+      }
+      
+      // テキストを更新
+      welcomeTitle.textContent = translations[lang].welcomeTitle;
+      startBtn.textContent = translations[lang].startButton;
+      explainTitle.textContent = translations[lang].explainTitle;
+      explainText1.textContent = translations[lang].explainText1;
+      explainText2.textContent = translations[lang].explainText2;
+      toSelectPageBtn.textContent = translations[lang].toSelectPage;
+      
+      // 現在の言語をローカルストレージに保存
+      localStorage.setItem('preferredLanguage', lang);
+    }
+    
+    // 言語ボタンのクリックイベント
+    if (langJaBtn && langEnBtn) {
+      langJaBtn.addEventListener('click', () => switchLanguage('ja'));
+      langEnBtn.addEventListener('click', () => switchLanguage('en'));
+    }
+    
+    // ページ読み込み時に保存された言語設定を適用
+    const savedLang = localStorage.getItem('preferredLanguage');
+    if (savedLang) {
+      switchLanguage(savedLang);
+    }
+    
+    // ページ遷移のイベント登録
+    const landingPage = document.querySelector('.landing-page');
+    const explainPage = document.getElementById('explainPage');
+    
+    // 「次へ」ボタンがクリックされたら説明ページを表示
+    if (startBtn && landingPage && explainPage) {
+      startBtn.addEventListener('click', () => {
+        landingPage.classList.add('hidden');
+        explainPage.style.display = 'flex';
+      });
+    }
+    
+    // 「次へ」ボタンがクリックされたらAR体験へ
+    if (toSelectPageBtn && explainPage) {
+      toSelectPageBtn.addEventListener('click', () => {
+        explainPage.style.display = 'none';
+        // AR体験ページへリダイレクト
+        window.location.href = '/ar';
+      });
+    }
+  });
+</script>
 
 <script is:inline src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
 
@@ -545,199 +414,5 @@ let projects = [
 		  },
 		  "retina_detect": true
 		});
-
-		// ページ切り替え用の要素
-		const landingPage = document.querySelector('.landing-page');
-		const explainPage = document.getElementById('explainPage');
-		const movieSelectPage = document.getElementById('movieSelectPage');
-		
-		// ボタン要素
-		const startButton = document.getElementById('startButton');
-		const arButton = document.querySelector('.ar-button');
-		const prevButton = document.getElementById('prevCard');
-		const nextButton = document.getElementById('nextCard');
-		const selectButton = document.getElementById('selectButton');
-		
-		// スライダー関連の要素
-		const cardSlides = document.querySelectorAll('.card-slide');
-		const dots = document.querySelectorAll('.dot');
-		const cardSlider = document.getElementById('cardSlider');
-		
-		// 現在のカードインデックス
-		let currentIndex = 0;
-		
-		// タッチ関連の変数
-		let touchStartX = 0;
-		let touchEndX = 0;
-		let isSwiping = false;
-		
-		// カードスライダーにタッチイベントを追加
-		if (cardSlider) {
-			cardSlider.addEventListener('touchstart', function(e) {
-				e.preventDefault();
-				touchStartX = e.changedTouches[0].screenX;
-				isSwiping = false;
-			}, { passive: false });
-			
-			cardSlider.addEventListener('touchmove', function(e) {
-				e.preventDefault();
-				const currentX = e.changedTouches[0].screenX;
-				const diffX = currentX - touchStartX;
-				
-				if (Math.abs(diffX) > 5) {
-					isSwiping = true;
-				}
-			}, { passive: false });
-			
-			cardSlider.addEventListener('touchend', function(e) {
-				e.preventDefault();
-				touchEndX = e.changedTouches[0].screenX;
-				const swipeDistance = touchEndX - touchStartX;
-				
-				if (isSwiping) {
-					handleSwipe(swipeDistance);
-				} else {
-					handleCardTap();
-				}
-			}, { passive: false });
-		}
-		
-		// アクティブなカードをタップしたときの処理
-		function handleCardTap() {
-			console.log("カードがタップされました:", currentIndex);
-			// 選択されたプロジェクトのインデックスをセッションストレージに保存
-			sessionStorage.setItem('selectedProject', currentIndex);
-			// AR画面へ遷移
-			window.location.href = "/ar";
-		}
-		
-		// クリックイベントもサポート（PCユーザー向け）
-		cardSlides.forEach(slide => {
-			slide.addEventListener('click', function() {
-				if (slide.classList.contains('active')) {
-					handleCardTap();
-				}
-			});
-		});
-		
-		// スワイプの処理をシンプルに
-		function handleSwipe(swipeDistance) {
-			if (swipeDistance > 30) { // 右スワイプ
-				if (currentIndex > 0) {
-					currentIndex--;
-					updateSlides();
-				}
-			} else if (swipeDistance < -30) { // 左スワイプ
-				if (currentIndex < cardSlides.length - 1) {
-					currentIndex++;
-					updateSlides();
-				}
-			}
-		}
-		
-		console.log("初期化中:", { 
-			slides: cardSlides.length, 
-			dots: dots.length, 
-			prevButton, 
-			nextButton 
-		});
-		
-		// 最初のスライドをアクティブに
-		if (cardSlides.length > 0) {
-			cardSlides[0].classList.add('active');
-			if (dots.length > 0) {
-				dots[0].classList.add('active');
-			}
-		}
-		
-		// ページ1からページ2への遷移
-		if (startButton) {
-			startButton.addEventListener('click', function() {
-				console.log("スタートボタンがクリックされました");
-				landingPage.classList.add('fade-out');
-				explainPage.classList.add('fade-in');
-			});
-		}
-		
-		// ページ2からページ3（カード選択）への遷移
-		if (arButton) {
-			arButton.addEventListener('click', function(e) {
-				e.preventDefault();
-				console.log("次へボタンがクリックされました");
-				explainPage.classList.remove('fade-in');
-				explainPage.classList.add('fade-out');
-				movieSelectPage.classList.add('fade-in');
-				
-				// カードスライドの初期化
-				updateSlides();
-			});
-		}
-		
-		// 前のカードへ移動
-		if (prevButton) {
-			prevButton.addEventListener('click', function() {
-				console.log("前へボタンがクリックされました");
-				if (currentIndex > 0) {
-					currentIndex--;
-					updateSlides();
-				}
-			});
-		}
-		
-		// 次のカードへ移動
-		if (nextButton) {
-			nextButton.addEventListener('click', function() {
-				console.log("次へボタンがクリックされました");
-				if (currentIndex < cardSlides.length - 1) {
-					currentIndex++;
-					updateSlides();
-				}
-			});
-		}
-		
-		// ドットをクリックして特定のカードへ移動
-		dots.forEach((dot, index) => {
-			dot.addEventListener('click', function() {
-				currentIndex = index;
-				updateSlides();
-			});
-		});
-		
-		// スライドの状態を更新
-		function updateSlides() {
-			console.log("スライド更新:", currentIndex);
-			
-			cardSlides.forEach((slide, index) => {
-				slide.classList.remove('active', 'prev', 'next');
-				
-				if (index === currentIndex) {
-					slide.classList.add('active');
-				} else if (index < currentIndex) {
-					slide.classList.add('prev');
-				} else {
-					slide.classList.add('next');
-				}
-			});
-			
-			// ドットの状態も更新
-			dots.forEach((dot, index) => {
-				if (index === currentIndex) {
-					dot.classList.add('active');
-				} else {
-					dot.classList.remove('active');
-				}
-			});
-		}
-		
-		// 選択ボタンの処理
-		if (selectButton) {
-			selectButton.addEventListener('click', function() {
-				console.log("選択ボタンがクリックされました");
-				// 選択されたプロジェクトのインデックスをセッションストレージに保存
-				sessionStorage.setItem('selectedProject', currentIndex);
-				// AR画面へ遷移
-				window.location.href = "/ar";
-			});
-		}
-	};
+	}
 </script>
