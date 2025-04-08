@@ -4,7 +4,7 @@ export const projects = [
         name: "松井ひなこ",
         romaji: "MATSUI HINAKO",
         keyword: "パフェに甘えて",
-        dir: "pafe"  // ディレクトリ名を追加
+        dir: "pafe"
     },
     {
         name: "林美羽",

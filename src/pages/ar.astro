@@ -4,6 +4,27 @@ import Fukidashi from '/Fukidashi.glb?url';
 import Marker from '/pattern.patt?url';
 import { projects } from '../data/projects.js';
 import BusinessCard from "../components/BusinessCard.astro";
+
+let projects = [
+	{
+		name: "松井ひなこ",
+		romaji: "MATSUI HINAKO",
+		keyword: "パフェに甘えて",
+		dir: "pafe"
+	},
+	{
+		name: "林美羽",
+		romaji: "HAYASHI MIU",
+		keyword: "わかめプロジェクト",
+		dir: "wakame"
+	},
+	{
+		name: "花火",
+		romaji: "HANABI",
+		keyword: "FRCロボコン",
+		dir: "hanabi"
+	}
+];
 ---
 
 <ARLayout>    
@@ -69,16 +90,20 @@ import BusinessCard from "../components/BusinessCard.astro";
                 embedded
                 arjs="trackingMethod: best; sourceType: webcam; debugUIEnabled: false;">
                 
+                <!-- アセットマネージメントシステムを追加 -->
+                <a-assets>
+                    <video 
+                        id="videoSource" 
+                        src=""
+                        crossorigin="anonymous"
+                        playsinline
+                        webkit-playsinline
+                        muted>
+                    </video>
+                </a-assets>
                 
                 <!-- マーカーが検出された位置に固定表示するためのエンティティを追加 -->
                 <a-entity id="fixed-content" visible="false"></a-entity>
-
-                <a-marker type='pattern' url='./pattern.patt'>
-                    <a-sphere scale=".25 .25 .25" position="0 .5 0" color="#f00">
-                      <a-animation attribute="position" to="0 1 0" direction="alternate" dur="2000" repeat="indefinite">
-                      </a-animation>
-                    </a-sphere>
-                </a-marker>
     
                 <a-marker
                     type="pattern"
@@ -451,50 +476,42 @@ import BusinessCard from "../components/BusinessCard.astro";
                 // デバッグ情報を更新
                 if (errorMessage) {
                     errorMessage.textContent = `動画をロード中: ${videoPath}`;
-                    error.style.color = 'yellow';
+                    errorMessage.style.color = 'yellow';
                 }
                 
                 // プロジェクトビデオ要素を取得
                 const projectVideo = document.getElementById('projectVideo');
-                if (projectVideo) {
-                    projectVideo.setAttribute('src', videoPath);
-                    projectVideo.setAttribute('muted', 'true');
-                    projectVideo.setAttribute('autoplay', 'true');
-                    projectVideo.setAttribute('playsinline', '');
+                const videoSource = document.getElementById('videoSource');
+
+                if (projectVideo && videoSource) {
+                    // ビデオソースを設定
+                    videoSource.src = videoPath;
+                    videoSource.load(); // 明示的に読み込み
+                    
+                    // a-videoにアセットのIDを指定
+                    projectVideo.setAttribute('src', '#videoSource');
                     projectVideo.setAttribute('visible', 'true');
                     
                     // デバッグ情報を表示
-                    console.log('動画要素にソースを設定:', projectVideo);
+                    console.log('動画要素にソースを設定:', videoSource);
                     
                     // 明示的に再生を試みる
-                    setTimeout(() => {
-                        try {
-                            const videoEl = projectVideo.components.material.material.map.image;
-                            if (videoEl) {
-                                videoEl.muted = true;
-                                
-                                // 動画再生終了イベントを追加
-                                videoEl.addEventListener('ended', () => {
-                                    console.log('動画再生が完了しました');
-                                    videoCompleted = true;
-                                    
-                                    // お礼メッセージを表示
-                                    if (thankYouContainer) thankYouContainer.style.display = 'block';
-                                    
-                                    // 選択されたプロジェクトIDをメッセージページ用に保存
-                                    sessionStorage.setItem('messageProject', sessionStorage.getItem('selectedProject'));
-                                });
-                                
-                                videoEl.play().catch(e => {
-                                    console.error('動画再生エラー:', e);
-                                    if (errorMessage) errorMessage.textContent = `動画エラー: ${e.message}`;
-                                });
-                            }
-                        } catch (e) {
-                            console.error('動画処理エラー:', e);
-                            if (errorMessage) errorMessage.textContent = `処理エラー: ${e.message}`;
-                        }
-                    }, 1000);
+                    videoSource.play().catch(e => {
+                        console.error('動画再生エラー:', e);
+                        if (errorMessage) errorMessage.textContent = `動画エラー: ${e.message}`;
+                    });
+                    
+                    // 動画再生終了イベントを追加
+                    videoSource.addEventListener('ended', () => {
+                        console.log('動画再生が完了しました');
+                        videoCompleted = true;
+                        
+                        // お礼メッセージを表示
+                        if (thankYouContainer) thankYouContainer.style.display = 'block';
+                        
+                        // 選択されたプロジェクトIDをメッセージページ用に保存
+                        sessionStorage.setItem('messageProject', sessionStorage.getItem('selectedProject'));
+                    });
                 }
             });
             
