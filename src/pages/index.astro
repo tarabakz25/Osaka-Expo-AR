@@ -3,7 +3,7 @@ import Layout from "../layouts/Layout.astro"
 import { Image } from "astro:assets"
 import KamiyamaLogo from "../assets/Kamiyama_Logo.svg"
 import '../styles/global.css'
-
+import '../styles/index.css'
 import BusinessCard from "../components/BusinessCard.astro"
 import { projects } from '../data/projects.js'
 
@@ -35,26 +35,34 @@ let projects = [
 
 <Layout>
 	<div id="particles-js" class="particles-container"></div>
+	
+	<!-- 言語切り替えボタン -->
+	<div class="language-switch">
+		<button id="langSwitch" class="lang-button">
+			<span id="langText">English</span>
+		</button>
+	</div>
+	
 	<div class="landing-page">
 		<div class="landing-content">
 			<div class="logo-container">
 				<Image src={KamiyamaLogo} alt="Kamiyama Logo" class="kamiyama-logo" />
 			</div>
-			<h1 class="welcome-title">大阪・関西万博徳島パビリオン 神山まるごと高専エリアへようこそ</h1>
-			<button class="start-button" id="startButton">次へ</button>
+			<h1 class="welcome-title" data-ja="大阪・関西万博徳島パビリオン 神山まるごと高専エリアへようこそ" data-en="Welcome to Kamiyama KOSEN Area at the Osaka-Kansai Expo Tokushima Pavilion">大阪・関西万博徳島パビリオン 神山まるごと高専エリアへようこそ</h1>
+			<button class="start-button" id="startButton" data-ja="次へ" data-en="Next">次へ</button>
 		</div>
 	</div>
 	<div class="explain_text-page" id="explainPage">
 		<div class="explain-content">
-			<h2>このプロジェクトは？</h2>
-			<p>ここでは、私たち神山まるごと高専生がARを通じて、神山まるごと高専の今を伝えるためのプロジェクトです。</p>
-			<p>目の前にあるマネキンにかざして、実際に神山まるごと高専の"今"を体験してみましょう。</p>
-			<button class="ar-button" id="toSelectPage">次へ</button>
+			<h2 data-ja="このプロジェクトは？" data-en="About This Project">このプロジェクトは？</h2>
+			<p data-ja="ここでは、私たち神山まるごと高専生がARを通じて、神山まるごと高専の今を伝えるためのプロジェクトです。" data-en="In this project, we, the students of Kamiyama KOSEN, use AR technology to share what's happening at our school right now.">ここでは、私たち神山まるごと高専生がARを通じて、神山まるごと高専の今を伝えるためのプロジェクトです。</p>
+			<p data-ja="目の前にあるマネキンにかざして、実際に神山まるごと高専の今を見てみてください。" data-en="Hold your device up to the mannequin in front of you to experience the current state of Kamiyama KOSEN.">目の前にあるマネキンにかざして、実際に神山まるごと高専の"今"を体験してみましょう。</p>
+			<button class="ar-button" id="toSelectPage" data-ja="次へ" data-en="Next">次へ</button>
 		</div>
 	</div>
 	<div class="movie_select-page" id="movieSelectPage">
 		<div class="movie-select-content">
-			<h2 class="page-title">プロジェクト紹介</h2>
+			<h2 class="page-title" data-ja="プロジェクト紹介" data-en="Project Introduction">プロジェクト紹介</h2>
 			<div class="card-slider-container">
 				<div class="card-slider" id="cardSlider">
 					{projects.map((project, index) => (
@@ -67,421 +75,17 @@ let projects = [
 						</div>
 					))}
 				</div>
-				<div class="swipe-hint">← スワイプでカードを切り替え →</div>
+				<div class="swipe-hint" data-ja="← スワイプでカードを切り替え →" data-en="← Swipe to change cards →">← スワイプでカードを切り替え →</div>
 			</div>
 			<div class="pagination-dots" id="paginationDots">
 				{projects.map((_, index) => (
 					<span class="dot" data-index={index}></span>
 				))}
 			</div>
-			<div class="tap-hint">カードをタップして選択</div>
+			<p class="tap-hint" data-ja="カードをタップして選択" data-en="Tap a card to select">カードをタップして選択</p>
 		</div>
 	</div>
 </Layout>
-
-<style>a
-	body {
-		margin: 0;
-		padding: 0;
-		overflow: hidden;
-		box-sizing: border-box;
-	}
-	
-	.particles-container {
-		position: fixed;
-		top: 0;
-		left: 0;
-		width: 100%;
-		height: 100%;
-		z-index: 1;
-		background: linear-gradient(45deg, #2B4798, #4A7CE0, #1C52B7, #6A9DFF);
-		background-size: 300% 300%;
-		animation: gradient 10s ease-in-out infinite alternate;
-	}
-	
-	@keyframes gradient {
-		0% {
-			background-position: 0% 0%;
-		}
-		25% {
-			background-position: 50% 50%;
-		}
-		50% {
-			background-position: 100% 100%;
-		}
-		75% {
-			background-position: 50% 50%;
-		}
-		100% {
-			background-position: 0% 0%;
-		}
-	}
-	
-	.landing-page {
-		position: fixed;
-		top: 0;
-		left: 0;
-		width: 100%;
-		height: 100vh;
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		z-index: 2;
-		background-color: transparent;
-	}
-	
-	.landing-content {
-		text-align: center;
-		padding: 1rem;
-		width: 90%;
-		max-width: 500px;
-		font-family: var(--default-font);
-		display: flex;
-		flex-direction: column;
-		justify-content: center;
-		align-items: center;
-	}
-	
-	.logo-container {
-		margin-bottom: 1.5rem;
-		width: 100%;
-		text-align: center;
-	}
-	
-	.landing-content .kamiyama-logo {
-		width: 100%;
-		max-width: 400px;
-		height: auto;
-		margin: 0 auto;
-		filter: invert(100%);
-	}
-	
-	.welcome-title {
-		font-size: 1.3rem;
-		margin: 1rem 0 1.5rem 0;
-		text-align: center;
-		width: 100%;
-		word-break: keep-all;
-		overflow-wrap: break-word;
-		color: var(--text-color-white);
-		padding: 10px;
-		border-radius: 8px;
-	}
-	
-	.start-button {
-		font-family: var(--default-font-english);
-		color: white;
-		border: none;
-		padding: 0.8rem 2rem;
-		font-size: 1rem;
-		border-radius: 25px;
-		cursor: pointer;
-		transition: all 0.3s;
-		display: inline-block;
-		text-decoration: none;
-		margin-top: 0.5rem;
-		background-color: rgba(255, 255, 255, 0.1);
-		backdrop-filter: blur(10px);
-		-webkit-backdrop-filter: blur(10px);
-	}
-	
-	.start-button:hover {
-		background-color: var(--accent-color);
-		opacity: 0.9;
-	}
-	
-	.hidden {
-		display: none !important;
-	}
-	
-	.explain_text-page {
-		position: fixed;
-		top: 0;
-		left: 0;
-		width: 100%;
-		height: 100vh;
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		z-index: 0;
-		opacity: 0;
-		visibility: hidden;
-		transition: opacity 1s ease, visibility 1s;
-		background-color: rgba(0, 0, 0, 0.2);
-		backdrop-filter: blur(5px);
-	}
-	
-	.explain-content {
-		text-align: center;
-		padding: 2rem;
-		width: 90%;
-		max-width: 600px;
-		backdrop-filter: blur(10px);
-		-webkit-backdrop-filter: blur(10px);
-		border-radius: 15px;
-		color: var(--text-color-white);
-		font-family: var(--default-font);
-	}
-	
-	.explain-content h2 {
-		font-size: 1.5rem;
-		margin-bottom: 1rem;
-	}
-	
-	.explain-content p {
-		margin-bottom: 1rem;
-		line-height: 1.6;
-	}
-	
-	.ar-button {
-		font-family: var(--default-font-english);
-		color: white;
-		border: none;
-		padding: 0.8rem 2rem;
-		font-size: 1rem;
-		border-radius: 25px;
-		cursor: pointer;
-		transition: all 0.3s;
-		display: inline-block;
-		text-decoration: none;
-		margin-top: 1rem;
-		background-color: var(--accent-color);
-	}
-	
-	.ar-button:hover {
-		opacity: 0.9;
-	}
-	
-	.fade-out {
-		opacity: 0 !important;
-		visibility: hidden !important;
-		z-index: 0 !important;
-	}
-	
-	.fade-in {
-		opacity: 1 !important;
-		visibility: visible !important;
-		z-index: 3 !important;
-	}
-	
-	@media (max-width: 480px) {
-		.landing-content {
-			width: 85%;
-			padding: 0.5rem;
-		}
-		
-		.welcome-title {
-			font-size: 1.1rem;
-		}
-		
-		.landing-content .kamiyama-logo {
-			width: 100px;
-		}
-		
-		.start-button {
-			padding: 0.7rem 1.8rem;
-		}
-
-		.explain-content {
-			padding: 1.5rem;
-			width: 85%;
-		}
-
-		.explain-content h2 {
-			font-size: 1.3rem;
-		}
-
-		.explain-content p {
-			font-size: 0.9rem;
-		}
-	}
-
-	.movie_select-page {
-		position: fixed;
-		top: 0;
-		left: 0;
-		width: 100%;
-		height: 100vh;
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		z-index: 0;
-		opacity: 0;
-		visibility: hidden;
-		transition: opacity 1s ease, visibility 1s;
-		background-color: rgba(19, 21, 26, 0.2);
-	}
-
-	.movie-select-content {
-		width: 100%;
-		max-width: 100%;
-		height: 100%;
-		display: flex;
-		flex-direction: column;
-		justify-content: flex-start;
-		padding-top: 5vh;
-		align-items: center;
-		text-align: center;
-		padding: 1rem;
-		color: var(--text-color-white);
-	}
-
-	.page-title {
-		font-size: 2rem;
-		margin-top: 5rem;
-		margin-bottom: 1rem;
-		font-family: var(--default-font);
-		color: white;
-	}
-
-	.card-slider-container {
-		position: relative;
-		width: 100%;
-		display: flex;
-		flex-direction: column;
-		justify-content: center;
-		align-items: center;
-		touch-action: pan-y pinch-zoom;
-	}
-
-	.card-slider {
-		width: 100%;
-		position: relative;
-		height: auto;
-		min-height: 450px;
-		margin: 0 auto;
-		touch-action: pan-x;
-		user-select: none;
-	}
-
-	.card-slide {
-		position: absolute;
-		width: 100%;
-		height: 100%;
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		transition: transform 0.4s ease, opacity 0.4s ease;
-		opacity: 0;
-		transform: scale(0.9);
-		pointer-events: none;
-		will-change: transform, opacity;
-	}
-
-	.card-slide.active {
-		opacity: 1;
-		transform: scale(1);
-		z-index: 2;
-		pointer-events: auto;
-		cursor: pointer;
-		position: relative;
-	}
-
-	.card-slide.active::after {
-		content: '';
-		position: absolute;
-		top: 0;
-		left: 0;
-		right: 0;
-		bottom: 0;
-		border-radius: 10px;
-		box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
-		opacity: 0;
-		transition: opacity 0.3s ease;
-		pointer-events: none;
-	}
-
-	.card-slide.active:hover::after {
-		opacity: 1;
-	}
-
-	.card-slide.prev {
-		opacity: 0;
-		transform: scale(0.8) translateX(-30px);
-		z-index: 1;
-	}
-
-	.card-slide.next {
-		opacity: 0;
-		transform: scale(0.8) translateX(30px);
-		z-index: 1;
-	}
-
-	.swipe-hint {
-		margin-top: 15px;
-		font-size: 0.9rem;
-		color: rgba(255, 255, 255, 0.7);
-		font-family: var(--default-font);
-		text-align: center;
-		animation: pulse 2s infinite;
-	}
-	
-	@keyframes pulse {
-		0% { opacity: 0.5; }
-		50% { opacity: 1; }
-		100% { opacity: 0.5; }
-	}
-
-	.pagination-dots {
-		display: flex;
-		justify-content: center;
-		margin: 0.5rem 0;
-	}
-
-	.dot {
-		width: 12px;
-		height: 12px;
-		background-color: rgba(255, 255, 255, 0.3);
-		border-radius: 50%;
-		margin: 0 8px;
-		cursor: pointer;
-		transition: background-color 0.3s;
-	}
-
-	.dot.active {
-		background-color: white;
-	}
-
-	.select-button {
-		font-family: var(--default-font);
-		background-color: var(--accent-color);
-		color: white;
-		border: none;
-		padding: 0.8rem 2.5rem;
-		font-size: 1rem;
-		border-radius: 50px;
-		cursor: pointer;
-		transition: all 0.3s;
-		margin-top: 0.75rem;
-	}
-
-	.select-button:hover {
-		opacity: 0.9;
-		transform: scale(1.05);
-	}
-
-	/* トランジション用のクラス */
-	.fade-in {
-		opacity: 1 !important;
-		visibility: visible !important;
-		z-index: 10 !important;
-	}
-
-	.fade-out {
-		opacity: 0 !important;
-		visibility: hidden !important;
-		z-index: 0 !important;
-	}
-
-	.tap-hint {
-		margin-top: 20px;
-		font-size: 1rem;
-		color: white;
-		font-family: var(--default-font);
-		text-align: center;
-		animation: pulse 2s infinite;
-	}
-</style>
 
 <script is:inline src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
 
@@ -554,9 +158,6 @@ let projects = [
 		// ボタン要素
 		const startButton = document.getElementById('startButton');
 		const arButton = document.querySelector('.ar-button');
-		const prevButton = document.getElementById('prevCard');
-		const nextButton = document.getElementById('nextCard');
-		const selectButton = document.getElementById('selectButton');
 		
 		// スライダー関連の要素
 		const cardSlides = document.querySelectorAll('.card-slide');
@@ -620,26 +221,32 @@ let projects = [
 			});
 		});
 		
-		// スワイプの処理をシンプルに
+		// スワイプの処理を自然な動きに修正
 		function handleSwipe(swipeDistance) {
+			let direction = '';
+			
 			if (swipeDistance > 30) { // 右スワイプ
+				direction = 'right';
 				if (currentIndex > 0) {
 					currentIndex--;
-					updateSlides();
+				} else {
+					currentIndex = cardSlides.length - 1;
 				}
 			} else if (swipeDistance < -30) { // 左スワイプ
+				direction = 'left';
 				if (currentIndex < cardSlides.length - 1) {
 					currentIndex++;
-					updateSlides();
+				} else {
+					currentIndex = 0;
 				}
 			}
+			
+			updateSlides(direction);
 		}
 		
 		console.log("初期化中:", { 
 			slides: cardSlides.length, 
 			dots: dots.length, 
-			prevButton, 
-			nextButton 
 		});
 		
 		// 最初のスライドをアクティブに
@@ -673,45 +280,41 @@ let projects = [
 			});
 		}
 		
-		// 前のカードへ移動
-		if (prevButton) {
-			prevButton.addEventListener('click', function() {
-				console.log("前へボタンがクリックされました");
-				if (currentIndex > 0) {
-					currentIndex--;
-					updateSlides();
-				}
-			});
-		}
-		
-		// 次のカードへ移動
-		if (nextButton) {
-			nextButton.addEventListener('click', function() {
-				console.log("次へボタンがクリックされました");
-				if (currentIndex < cardSlides.length - 1) {
-					currentIndex++;
-					updateSlides();
-				}
-			});
-		}
-		
 		// ドットをクリックして特定のカードへ移動
 		dots.forEach((dot, index) => {
 			dot.addEventListener('click', function() {
+				const direction = index > currentIndex ? 'left' : 'right';
 				currentIndex = index;
-				updateSlides();
+				updateSlides(direction);
 			});
 		});
 		
-		// スライドの状態を更新
-		function updateSlides() {
-			console.log("スライド更新:", currentIndex);
+		// スライドの状態を更新（アニメーション方向を考慮）
+		function updateSlides(direction = '') {
+			console.log("スライド更新:", currentIndex, "方向:", direction);
+			
+			// 前のインデックス値を保存（ループ処理用）
+			const prevIndex = (currentIndex === 0 && direction === 'right') ? cardSlides.length - 1 : 
+							 (currentIndex === cardSlides.length - 1 && direction === 'left') ? 0 : null;
 			
 			cardSlides.forEach((slide, index) => {
 				slide.classList.remove('active', 'prev', 'next');
 				
 				if (index === currentIndex) {
 					slide.classList.add('active');
+				} else if (direction === 'left' && currentIndex === 0 && index === cardSlides.length - 1) {
+					// 左スワイプで最後のカードから最初のカードに移動する場合、最後のカードを左側に配置
+					slide.classList.add('prev');
+				} else if (direction === 'right' && currentIndex === cardSlides.length - 1 && index === 0) {
+					// 右スワイプで最初のカードから最後のカードに移動する場合、最初のカードを右側に配置
+					slide.classList.add('next');
+				} else if (index === prevIndex) {
+					// 特別なループ処理時に、前のカードが適切な位置に配置されるようにする
+					if (direction === 'right') {
+						slide.classList.add('next');
+					} else if (direction === 'left') {
+						slide.classList.add('prev');
+					}
 				} else if (index < currentIndex) {
 					slide.classList.add('prev');
 				} else {
@@ -728,15 +331,34 @@ let projects = [
 				}
 			});
 		}
+
+		// 言語切り替え機能の追加
+		const langButton = document.getElementById('langSwitch');
+		const langText = document.getElementById('langText');
+		let currentLang = localStorage.getItem('language') || 'ja'; // 初期言語を日本語に設定
 		
-		// 選択ボタンの処理
-		if (selectButton) {
-			selectButton.addEventListener('click', function() {
-				console.log("選択ボタンがクリックされました");
-				// 選択されたプロジェクトのインデックスをセッションストレージに保存
-				sessionStorage.setItem('selectedProject', currentIndex);
-				// AR画面へ遷移
-				window.location.href = "/ar";
+		// ページ読み込み時に保存された言語設定を適用
+		applyLanguage(currentLang);
+		
+		// 言語切り替えボタンのイベントリスナー
+		if (langButton) {
+			langButton.addEventListener('click', function() {
+				currentLang = currentLang === 'ja' ? 'en' : 'ja';
+				localStorage.setItem('language', currentLang);
+				applyLanguage(currentLang);
+			});
+		}
+		
+		// 言語設定を適用する関数
+		function applyLanguage(lang) {
+			// ボタンのテキストを更新
+			if (langText) {
+				langText.textContent = lang === 'ja' ? 'English' : '日本語';
+			}
+			
+			// すべての多言語対応要素を更新
+			document.querySelectorAll('[data-ja][data-en]').forEach(element => {
+				element.textContent = element.getAttribute(`data-${lang}`);
 			});
 		}
 	};

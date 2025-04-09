@@ -1,0 +1,188 @@
+.particles-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    background: linear-gradient(45deg, #2B4798, #4A7CE0, #1C52B7, #6A9DFF);
+    background-size: 300% 300%;
+    animation: gradient 10s ease-in-out infinite alternate;
+}
+
+@keyframes gradient {
+    0% { background-position: 0% 0%; }
+    25% { background-position: 50% 50%; }
+    50% { background-position: 100% 100%; }
+    75% { background-position: 50% 50%; }
+    100% { background-position: 0% 0%; }
+}
+
+.message-container {
+    position: relative;
+    z-index: 2;
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 2rem;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 80vh;
+}
+
+.message-title {
+    text-align: center;
+    margin-bottom: 2rem;
+    font-size: 1.0rem;
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+}
+
+
+.message-form {
+    border-radius: 0.5rem;
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    width: 100%;
+    box-sizing: border-box;
+    margin: 0 auto;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+    text-align: center;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    text-align: center;
+    font-size: 1.1rem;
+    width: 100%;
+    color: #fff;
+}
+
+.form-input, .form-textarea {
+    width: 100%;
+    max-width: 100%;
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    font-size: 1rem;
+    background-color: rgba(255, 255, 255, 0.2);
+    color: white;
+    text-align: center;
+    box-sizing: border-box;
+    margin: 0 auto;
+}
+
+.form-textarea {
+    resize: vertical;
+    min-height: 120px;
+    text-align: center;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 2rem;
+    width: 100%;
+}
+
+.submit-button, .back-button {
+    padding: 0.75rem 1.5rem;
+    border-radius: 2rem;
+    border: none;
+    font-size: 1rem;
+    cursor: pointer;
+    text-decoration: none;
+    text-align: center;
+    min-width: 120px;
+    transition: all 0.3s ease;
+}
+
+.submit-button {
+    background-color: #4caf50;
+    color: white;
+}
+
+.submit-button:hover {
+    background-color: #3d9140;
+    transform: translateY(-2px);
+}
+
+.back-button {
+    background-color: rgba(255, 255, 255, 0.2);
+    color: white;
+}
+
+.back-button:hover {
+    background-color: rgba(255, 255, 255, 0.3);
+    transform: translateY(-2px);
+}
+
+.thank-you-message {
+    background-color: rgba(255, 255, 255, 0.15);
+    padding: 2rem;
+    border-radius: 0.5rem;
+    text-align: center;
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    width: 100%;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* プレースホルダーテキストのスタイル */
+::placeholder {
+    color: rgba(255, 255, 255, 0.7);
+    opacity: 1;
+    text-align: center;
+}
+
+.form-project-name {
+    margin-bottom: 1.5rem;
+    text-align: center;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.form-project-name label {
+    display: block;
+    margin-bottom: 0.5rem;
+    text-align: center;
+    font-size: 1.1rem;
+    color: white;
+}
+
+.form-select {
+    width: 100%;
+    max-width: 100%;
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    font-size: 1rem;
+    background-color: rgba(255, 255, 255, 0.2);
+    color: white;
+    text-align-last: center;  /* テキストを中央揃えにする */
+    box-sizing: border-box;
+    margin: 0 auto;
+    appearance: none;  /* ネイティブのドロップダウン矢印を非表示 */
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    background-size: 16px 12px;
+    cursor: pointer;
+}
+
+.form-select option {
+    background-color: #4A7CE0;
+    color: white;
+}
