@@ -16,12 +16,14 @@ import { projects } from '../data/projects.js';
             <Image src={MarkerAnnounce} alt="マーカー読み取り案内" width={250} height={250} />
         </div>
     
+        <!-- loadingMessage 要素を追加 -->
+        <div id="loadingMessage" style="display: none;">マーカーを探しています...</div>
+    
         <!-- デバッグ情報表示エリア -->
         <div id="debugInfo" style="position: fixed; top: 10px; left: 10px; background-color: rgba(0,0,0,0.7); color: white; padding: 10px; z-index: 9999; border-radius: 5px; width: 80%; max-width: 300px;">
             <h3 style="margin: 0 0 5px 0; font-size: 14px;">デバッグ情報</h3>
             <div>マーカー状態: <span id="markerStatus">未検出</span></div>
             <div>現在のプロジェクト: <span id="currentProject">なし</span></div>
-            <div>テキスト読込: <span id="textLoadStatus">未読込</span></div>
             <div>動画読込: <span id="videoLoadStatus">未読込</span></div>
             <div id="errorMessage" style="color: #ff6b6b;"></div>
         </div>
@@ -48,15 +50,6 @@ import { projects } from '../data/projects.js';
                 <a-entity id="fixed-content" visible="false"></a-entity>
     
                 <a-marker type="pattern" url='pattern.patt' id="patternMarker">
-                    <!-- マーカー上に直接コンテンツを配置 -->
-                        <!-- <a-entity
-                            id="fukidashiModel"
-                            gltf-model={Fukidashi}
-                            scale="0.5 0.5 1"
-                            position="0 0 0"
-                            rotation="180 90 -90"
-                            visible="true">
-                        </a-entity> -->
                         <a-entity
                             id="projectText"
                             scale="1 1 1"
@@ -70,9 +63,7 @@ import { projects } from '../data/projects.js';
                             height="1"
                             position="0 0 0"
                             rotation="-45 0 0"
-                            src="#movieAsset"
-                            autoplay
-                            playsinline>
+                            crossorigin="anonymous">
                         </a-video>
                 </a-marker>
                 <!-- カメラ -->
@@ -85,22 +76,20 @@ import { projects } from '../data/projects.js';
 <script define:vars={{ projects }}>
     // DOMが読み込まれたら実行
     document.addEventListener('DOMContentLoaded', () => {
-        // a-nftではなくa-markerを取得するように修正
+        const scene = document.querySelector('a-scene'); // シーン要素を取得
         const marker = document.querySelector('#patternMarker');
         console.log('マーカー要素検索結果:', marker);
         const loadingMessage = document.getElementById('loadingMessage');
         const projectText = document.getElementById('projectText');
-        const projectVideo = document.getElementById('projectVideo');
+        const movieAsset = document.getElementById('movieAsset'); // movieAsset もここで取得
+        const fixedContent = document.getElementById('fixed-content'); // 固定用エンティティ
+
         const thankYouContainer = document.getElementById('thankYouContainer');
-        
-        // デバッグ情報表示用要素 - nullチェックを追加
         const markerStatus = document.getElementById('markerStatus');
         const currentProject = document.getElementById('currentProject');
-        const textLoadStatus = document.getElementById('textLoadStatus');
         const videoLoadStatus = document.getElementById('videoLoadStatus');
         const errorMessage = document.getElementById('errorMessage');
-        
-        // セッションストレージから選択されたプロジェクトを取得
+
         const selectedProjectIndex = sessionStorage.getItem('selectedProject');
         
         // デバッグ情報：プロジェクト情報を表示
@@ -112,109 +101,223 @@ import { projects } from '../data/projects.js';
             errorMessage.textContent = '先に選択画面でプロジェクトを選んでください';
         }
         
-        // 動画再生完了フラグ
         let videoCompleted = false;
-        
-        // マーカーが存在する場合のみイベントリスナーを追加
-        if (marker) {
+        let isContentFixed = false; // コンテンツ固定フラグ
+        let playVideoOnClick = null; // クリックリスナー関数
+        let errorListener = null;    // エラーリスナー関数
+        let canPlayListener = null; // canplayリスナー関数
+
+        // リスナーをクリアするヘルパー関数
+        const clearListeners = () => {
+            if (playVideoOnClick) {
+                document.body.removeEventListener('click', playVideoOnClick);
+                playVideoOnClick = null;
+            }
+            if (movieAsset) {
+                 if (errorListener) movieAsset.removeEventListener('error', errorListener);
+                 if (canPlayListener) movieAsset.removeEventListener('canplay', canPlayListener);
+                 // movieAsset.onended = null; // onended も必要なら解除
+            }
+             errorListener = null;
+             canPlayListener = null;
+        };
+
+        if (marker && scene && fixedContent && movieAsset && projectText) { // 必要な要素が揃っているか確認
             // マーカーが検出されたときの処理
             marker.addEventListener('markerFound', () => {
                 console.log('マーカーが検出されました:', marker.id);
-                console.log('マーカータイプ:', marker.getAttribute('type'));
                 if (markerStatus) markerStatus.textContent = '検出中';
                 if (markerStatus) markerStatus.style.color = '#66ff66';
                 if (loadingMessage) loadingMessage.style.display = 'none';
-                
-                // 既に動画再生が完了していたらお礼メッセージを表示
-                if (videoCompleted) {
-                    thankYouContainer.style.display = 'block';
+
+                // 既に固定されているか、動画が完了していたら何もしない
+                if (isContentFixed || videoCompleted) {
+                    // ただし、動画完了後のお礼メッセージは表示
+                    if (videoCompleted && thankYouContainer) {
+                        thankYouContainer.style.display = 'block';
+                    }
                     return;
                 }
-                
-                // マーカー検出デバッグ情報を追加
-                errorMessage.textContent = 'マーカーを検出しました。マーカー上に直接表示します...';
+
+                console.log('コンテンツを初回固定します。');
+                errorMessage.textContent = 'マーカーを検出しました。コンテンツを固定表示します...';
                 errorMessage.style.color = '#66ff66';
-                
-                // 選択されたプロジェクトがない場合は処理を中止
+
+                // --- プロジェクト設定 ---
                 if (selectedProjectIndex === null || !projects[selectedProjectIndex]) {
                     errorMessage.textContent = 'プロジェクトが選択されていません';
                     return;
                 }
-                
                 const project = projects[selectedProjectIndex];
                 console.log('表示プロジェクト:', project);
                 currentProject.textContent = `${project.name}`;
-                
-                // markerContentの条件をなくし、直接projectTextを更新
-                const projectTextEl = document.getElementById('projectText');
-                if (projectTextEl) {
-                    // 選択されたプロジェクトのテキストを表示するよう更新
-                    projectTextEl.setAttribute('text', `value: ${project.name} - ${project.keyword}; align: center; width: 2; color: black;`);
-                    projectTextEl.setAttribute('visible', 'true');
-                }
-                
-                // 動画要素を取得
-                const movieAsset = document.getElementById('movieAsset');
-                if (movieAsset) {
-                    // 動画パスを更新
-                    const videoPath = `/items/${project.dir}/movie.mp4`;
-                    console.log('動画パスを設定:', videoPath);
-                    if (videoLoadStatus) videoLoadStatus.textContent = '読込開始...';
-                    
-                    // 既存の属性を設定
-                    movieAsset.src = videoPath;
-                    movieAsset.muted = true; // 重要: 自動再生にはミュートが必要
-                    movieAsset.setAttribute('playsinline', '');
-                    movieAsset.setAttribute('crossorigin', 'anonymous');
-                    
-                    // 動画をロード
-                    movieAsset.load();
-                    
-                    // ユーザーインタラクションに応じて再生（例：画面タップ）
-                    document.body.addEventListener('click', function playVideo() {
-                        movieAsset.play().then(() => {
-                            console.log('動画再生成功');
-                            if (videoLoadStatus) videoLoadStatus.textContent = '再生中';
-                            // イベントリスナーを削除（一度だけ実行）
-                            document.body.removeEventListener('click', playVideo);
-                        }).catch(e => {
-                            console.error('動画再生エラー:', e);
-                            errorMessage.textContent = `動画エラー: ${e.message}`;
-                        });
-                    }, { once: true });
-                    
-                    // 動画終了イベント
-                    movieAsset.onended = () => {
-                        console.log('動画再生が完了しました');
-                        videoCompleted = true;
-                        
-                        // お礼メッセージを表示
-                        thankYouContainer.style.display = 'block';
-                        
-                        // 選択されたプロジェクトIDをメッセージページ用に保存
-                        if (selectedProjectIndex !== null) {
-                            sessionStorage.setItem('messageProject', selectedProjectIndex);
+
+                // テキスト設定 (移動前に設定しても良い)
+                projectText.setAttribute('text', `value: ${project.name} - ${project.keyword}; align: center; width: 4; color: black;`);
+
+                // --- 位置固定処理 ---
+                const markerWorldPos = new THREE.Vector3();
+                const markerWorldQuat = new THREE.Quaternion();
+                marker.object3D.getWorldPosition(markerWorldPos);
+                marker.object3D.getWorldQuaternion(markerWorldQuat);
+
+                fixedContent.setAttribute('position', markerWorldPos);
+                fixedContent.setAttribute('rotation', { // QuaternionをEulerに変換して設定
+                     x: new THREE.Euler().setFromQuaternion(markerWorldQuat, 'YXZ').x * (180 / Math.PI),
+                     y: new THREE.Euler().setFromQuaternion(markerWorldQuat, 'YXZ').y * (180 / Math.PI),
+                     z: new THREE.Euler().setFromQuaternion(markerWorldQuat, 'YXZ').z * (180 / Math.PI)
+                });
+
+                // --- 要素の移動と相対位置調整 ---
+                 console.log('movieAsset と projectText を fixedContent に移動します。');
+                // video は fixedContent の原点に、回転もリセット
+                movieAsset.setAttribute('position', '0 0 0');
+                movieAsset.setAttribute('rotation', '0 0 0'); // 回転をリセット
+                // text は video の少し上、手前に（調整が必要）
+                projectText.setAttribute('position', '0 1.5 0.5'); // Y軸に1.5、Z軸に0.5移動
+                projectText.setAttribute('rotation', '0 0 0'); // 回転をリセット
+
+                 fixedContent.appendChild(movieAsset);
+                 fixedContent.appendChild(projectText);
+
+                 // --- 表示とフラグ設定 ---
+                 fixedContent.setAttribute('visible', 'true');
+                 projectText.setAttribute('visible', 'true'); // テキストも確実に表示
+                 isContentFixed = true; // 固定完了フラグ
+                 console.log('コンテンツの固定完了。');
+
+                 // --- 動画設定 (要素移動後に行う) ---
+                 const videoPath = `/items/${project.dir}/movie.mp4`;
+                 console.log('動画パスを設定:', videoPath);
+                 if (videoLoadStatus) videoLoadStatus.textContent = '読込準備中...';
+                 movieAsset.src = ''; // Reset src first
+                 movieAsset.src = videoPath;
+                 movieAsset.load(); // Load the video source
+                 if (videoLoadStatus) videoLoadStatus.textContent = '読込中...';
+
+                 // --- イベントリスナー設定 (固定後に行う) ---
+                 clearListeners(); // 既存のリスナーをクリア
+
+                // canplay リスナー
+                canPlayListener = () => {
+                    console.log('動画再生準備完了 (canplay)');
+                    if (videoLoadStatus) videoLoadStatus.textContent = '再生準備完了 (タップしてください)';
+                    if (videoLoadStatus) videoLoadStatus.style.color = '#66ff66';
+                    // movieAsset.removeEventListener('canplay', canPlayListener); // 一度だけで良いなら解除
+                };
+                 movieAsset.addEventListener('canplay', canPlayListener, { once: true }); // 一度だけ実行
+
+                // エラーリスナー
+                errorListener = (e) => {
+                    console.error('動画読み込み/再生エラー:', e);
+                    errorMessage.textContent = `動画ファイル/再生でエラー (${e.type})。`;
+                    if (videoLoadStatus) videoLoadStatus.textContent = '読込/再生エラー';
+                    if (videoLoadStatus) videoLoadStatus.style.color = '#ff6b6b';
+                    clearListeners(); // エラー時は他のリスナーもクリア
+                };
+                movieAsset.addEventListener('error', errorListener);
+
+                // 終了イベント
+                 movieAsset.onended = () => {
+                    console.log('動画再生が完了しました');
+                    videoCompleted = true;
+                    if (thankYouContainer) thankYouContainer.style.display = 'block';
+                    if (selectedProjectIndex !== null) {
+                        sessionStorage.setItem('messageProject', selectedProjectIndex);
+                    }
+                     clearListeners(); // 終了時もクリア
+                 };
+
+                // 再生用クリックリスナー定義
+                playVideoOnClick = () => {
+                    console.log('再生ボタン（画面タップ）が押されました。');
+                    // コンテンツが固定されていて、動画要素が存在する場合のみ実行
+                    if (!isContentFixed || !movieAsset) {
+                        console.warn('コンテンツ未固定または動画要素不在のため再生しません。');
+                        return;
+                    }
+
+                    console.log(`動画の readyState: ${movieAsset.readyState}`);
+                    if (movieAsset.readyState < 3) {
+                        console.warn(`動画データがまだ不十分です (readyState: ${movieAsset.readyState})。`);
+                         errorMessage.textContent = '動画の読み込みが追いついていません。少し待って再度タップしてください。';
+                         if (videoLoadStatus) videoLoadStatus.textContent = 'データ不足';
+                        return; // データ不足時は再生しない方が安全かも
+                    }
+
+                    console.log('movieAsset.play() を試みます...');
+                    if (videoLoadStatus) videoLoadStatus.textContent = '再生試行中...';
+                    try {
+                        const playPromise = movieAsset.play();
+                        if (playPromise !== undefined) {
+                            playPromise.then(() => {
+                                console.log('動画再生成功');
+                                if (videoLoadStatus) videoLoadStatus.textContent = '再生中';
+                                if (videoLoadStatus) videoLoadStatus.style.color = '#66ff66';
+                                // 成功したらリスナー削除
+                                clearListeners();
+                                console.log('再生成功のため、クリックリスナーを削除しました。');
+                            }).catch(e => {
+                                console.error('動画再生エラー (Promise catch):', e);
+                                // エラーメッセージ表示 (前回のコード流用)
+                                if (e.name === 'NotAllowedError') errorMessage.textContent = 'ブラウザにより自動再生がブロックされました。画面を再度タップしてください。';
+                                else if (e.name === 'AbortError') errorMessage.textContent = '動画の読み込みが中断されました。';
+                                else errorMessage.textContent = `動画再生エラー: ${e.message}. 再度タップしてみてください。`;
+                                if (videoLoadStatus) videoLoadStatus.textContent = '再生失敗';
+                                if (videoLoadStatus) videoLoadStatus.style.color = '#ff6b6b';
+                                // 失敗時はリスナーを残して再タップ可能にする
+                            });
+                        } else {
+                            console.error('致命的エラー: movieAsset.play() が Promise を返しませんでした。');
+                             errorMessage.textContent = 'ブラウザが再生操作を認識できませんでした。ページをリロードするか、ブラウザの設定を確認してください。';
+                            if (videoLoadStatus) videoLoadStatus.textContent = '再生開始不可';
+                            if (videoLoadStatus) videoLoadStatus.style.color = '#ff6b6b';
                         }
-                    };
-                }
-            });
-            
+                    } catch (error) {
+                         console.error('movieAsset.play() 呼び出し中に予期せぬエラー:', error);
+                         errorMessage.textContent = `予期せぬ再生エラー: ${error.message}`;
+                         if (videoLoadStatus) videoLoadStatus.textContent = '再生エラー(例外)';
+                         if (videoLoadStatus) videoLoadStatus.style.color = '#ff6b6b';
+                    }
+                }; // playVideoOnClick 定義終わり
+
+                // 再生用クリックリスナーをアタッチ
+                document.body.addEventListener('click', playVideoOnClick);
+                console.log('再生用のクリックリスナーを body にアタッチしました。');
+
+            }); // markerFound の終わり
+
+
             // マーカーを見失ったときの処理
             marker.addEventListener('markerLost', () => {
                 console.log('マーカーを見失いました');
-                if (markerStatus) markerStatus.textContent = '未検出';
-                if (markerStatus) markerStatus.style.color = '#ffff66';
-                
-                // 動画再生完了後は、loadingMessageを表示しない
-                if (!videoCompleted) {
-                    loadingMessage.style.display = 'block';
+                 if (markerStatus) markerStatus.textContent = '未検出';
+                 if (markerStatus) markerStatus.style.color = '#ffff66';
+
+                 // コンテンツが固定された後は、マーカーロストのメッセージは不要かも
+                if (!isContentFixed) {
+                    if (loadingMessage) loadingMessage.style.display = 'block'; // loadingMessage が存在する場合のみ
                     errorMessage.textContent = 'マーカーを見失いました。再度マーカーを探してください。';
+                     // クリックリスナーも念のため削除
+                     clearListeners();
                 }
-            });
+
+                 // 動画が再生中の場合は一時停止 (固定後も行う)
+                if (movieAsset && !movieAsset.paused) {
+                    movieAsset.pause();
+                     console.log('マーカーを見失ったため、動画を一時停止しました。');
+                     if (videoLoadStatus && isContentFixed) { // 固定後ならステータス更新
+                         videoLoadStatus.textContent = '一時停止 (マーカーロスト)';
+                         videoLoadStatus.style.color = '#ffff66';
+                    }
+                }
+            }); // markerLost の終わり
+
         } else {
-            console.error('マーカー要素が見つかりませんでした');
+            console.error('必要な要素 (scene, marker, fixedContent, movieAsset, projectText のいずれか) が見つかりませんでした');
+            errorMessage.textContent = 'AR初期化エラー。ページをリロードしてください。';
         }
-    });
+    }); // DOMContentLoaded の終わり
 </script>
 
 <style>
