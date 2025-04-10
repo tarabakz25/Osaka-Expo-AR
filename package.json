@@ -11,7 +11,6 @@
   "dependencies": {
     "@ar-js-org/ar.js": "^3.4.7",
     "astro": "^5.4.1",
-    "better-sqlite3": "^11.9.1",
     "three": "^0.174.0",
     "vanta": "^0.5.24"
   }
