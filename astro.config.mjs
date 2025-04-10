@@ -4,10 +4,6 @@ import node from '@astrojs/node'; // Nodeアダプターをインポート
 
 // https://astro.build/config
 export default defineConfig({
-    output: 'server',
-    adapter: node({ // Nodeアダプターを設定
-        mode: 'standalone' // または 'middleware'
-    }),
     server: {
         allowedHosts: [
           'vulture-keen-magpie.ngrok-free.app',
