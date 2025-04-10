@@ -1,13 +1,14 @@
 ---
 import Layout from "../../layouts/Layout.astro";
 // import { getMessages } from '../../db/messages.js';
-import { getAllMessages, getMessagesByProject } from '../../db/messages.js';
+// import { getAllMessages, getMessagesByProject } from '../../db/messages.js';
 import { projects } from '../../data/projects.js';
 
 // メッセージの取得
 let messages = [];
 let selectedProject = Astro.url.searchParams.get('project');
 
+/*
 try {
   if (selectedProject !== null) {
     messages = getMessagesByProject(selectedProject);
@@ -17,6 +18,7 @@ try {
 } catch (error) {
   console.error('メッセージの取得に失敗しました:', error);
 }
+*/
 ---
 
 <Layout>
@@ -38,7 +40,7 @@ try {
     <div class="messages-list">
       <h2>メッセージ一覧</h2>
       {messages.length === 0 ? (
-        <p class="no-messages">メッセージがありません</p>
+        <p class="no-messages">メッセージがありません（または表示機能が無効です）</p>
       ) : (
         <div class="message-cards">
           {messages.map((message) => (
