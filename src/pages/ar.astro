@@ -9,27 +9,36 @@ import { projects } from '../data/projects.js';
     <script is:inline src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
     <script is:inline src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
     <div id="arjsContent">
+        <!-- ★ 開始を促すオーバーレイを追加 -->
+        <div id="startOverlay" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.7); color: white; display: flex; justify-content: center; align-items: center; z-index: 100; text-align: center; flex-direction: column; font-size: 1.2em; cursor: pointer;">
+            <p>AR体験を開始するには</p>
+            <p>画面をタップしてください</p>
+            <p style="font-size: 0.8em; margin-top: 2em;">(タップ後にカメラへのアクセス許可を求められます)</p>
+        </div>
         <!-- マーカー読み取り案内 -->
         <div class="marker-image">
             <Image src={MarkerAnnounce} alt="マーカー読み取り案内" width={250} height={250} />
         </div>
     
         <!-- デバッグ情報表示エリア -->
-        <div id="debugInfo" style="position: fixed; top: 10px; left: 10px; background-color: rgba(0,0,0,0.7); color: white; padding: 10px; z-index: 9999; border-radius: 5px; width: 80%; max-width: 300px;">
+        <!-- <div id="debugInfo" style="position: fixed; top: 10px; left: 10px; background-color: rgba(0,0,0,0.7); color: white; padding: 10px; z-index: 9999; border-radius: 5px; width: 80%; max-width: 300px;">
             <h3 style="margin: 0 0 5px 0; font-size: 14px;">デバッグ情報</h3>
             <div>マーカー状態: <span id="markerStatus">未検出</span></div>
             <div>現在のプロジェクト: <span id="currentProject">なし</span></div>
             <div>テキスト読込: <span id="textLoadStatus">未読込</span></div>
             <div>動画読込: <span id="videoLoadStatus">未読込</span></div>
             <div id="errorMessage" style="color: #ff6b6b;"></div>
-        </div>
+        </div> -->
         
         <!-- 動画再生後のお礼メッセージ -->
-        <div id="thankYouContainer" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 30; background-color: rgba(0, 0, 0, 0.8); color: white; padding: 2em; border-radius: 1em; text-align: center; max-width: 80%;">
+        <div id="thankYouContainer" style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 30; background-color: rgba(0, 0, 0, 0.8); color: white; padding: 2em; border-radius: 1em; text-align: center; max-width: 80%;">
             <h2>ご視聴ありがとうございました！</h2>
             <p>学生の作品はいかがでしたか？</p>
             <p>良ければ、学生へのメッセージをお願いします。</p>
-            <a href="/message" id="messageButton" style="display: inline-block; margin-top: 1em; background-color: #4caf50; color: white; padding: 0.75rem 1.5rem; border-radius: 2rem; text-decoration: none; font-size: 1rem;">メッセージを送る</a>
+            <div class="button-container" style="margin-top: 1.5em; display: flex; justify-content: center; gap: 1em; flex-wrap: wrap;">
+                <a href="/message" id="messageButton" class="thank-you-button">メッセージを送る</a>
+                <a href="/" id="viewOtherProjectsButton" class="thank-you-button">他のプロジェクトを見る</a>
+            </div>
         </div>
         
         <div id="arjs-scene">
@@ -37,17 +46,14 @@ import { projects } from '../data/projects.js';
                 vr-mode-ui="enabled: false;"
                 renderer="logarithmicDepthBuffer: true; precision: medium;"
                 embedded
-                arjs="trackingMethod: best; sourceType: webcam; debugUIEnabled: true;">
+                arjs="trackingMethod: best; sourceType: webcam;">
                 
                 <!-- アセット管理システム -->
                 <a-assets>
-                    <video id="projectVideo" src="" preload="auto" loop="false" playsinline></video>
+                    <video id="projectVideo" src="" loop="false" playsinline></video>
                 </a-assets>
                 
-                <!-- マーカーが検出された位置に固定表示するためのエンティティ -->
-                <a-entity id="fixed-content" visible="false"></a-entity>
-    
-                <a-marker type="pattern" url='pattern.patt' id="patternMarker">
+                <a-marker type="pattern" url='/pattern.patt' id="patternMarker">
                     <a-entity
                         id="projectText"
                         scale="1 1 1"
@@ -57,11 +63,12 @@ import { projects } from '../data/projects.js';
                     </a-entity>
                     <a-video
                         id="projectVideoEntity"
-                        width="4"
-                        height="1"
+                        width="6"
+                        height="2"
                         position="0 0 0"
                         rotation="-45 0 0"
                         src="#projectVideo"
+                        visible="false"
                         playsinline>
                     </a-video>
                 </a-marker>
@@ -72,10 +79,11 @@ import { projects } from '../data/projects.js';
     </div>
 </ARLayout>
 
-<script is:inline>
+<script define:vars={{ projects }}>
     document.addEventListener('DOMContentLoaded', () => {
         const marker = document.getElementById('patternMarker');
         const projectVideo = document.getElementById('projectVideo');
+        const projectVideoEntity = document.getElementById('projectVideoEntity');
         const projectText = document.getElementById('projectText');
         const markerStatus = document.getElementById('markerStatus');
         const currentProject = document.getElementById('currentProject');
@@ -83,55 +91,74 @@ import { projects } from '../data/projects.js';
         const videoLoadStatus = document.getElementById('videoLoadStatus');
         const thankYouContainer = document.getElementById('thankYouContainer');
         const errorMessage = document.getElementById('errorMessage');
+        const startOverlay = document.getElementById('startOverlay');
+        const markerAnnounceImage = document.querySelector('.marker-image');
+        const sceneEl = document.querySelector('a-scene');
         
-        // プロジェクトデータを取得
-        const projectsData = [
-            {
-                name: "松井ひなこ",
-                romaji: "MATSUI HINAKO",
-                keyword: "パフェに甘えて",
-                dir: "pafe"
-            },
-            {
-                name: "林美羽",
-                romaji: "HAYASHI MIU",
-                keyword: "わかめプロジェクト",
-                dir: "wakame"
-            },
-            {
-                name: "花火",
-                romaji: "HANABI",
-                keyword: "FRCロボコン",
-                dir: "hanabi"
+        let canPlayVideo = false;
+        let userInteracted = false;
+
+        startOverlay.addEventListener('click', () => {
+            userInteracted = true;
+            startOverlay.style.display = 'none';
+            if (markerAnnounceImage) {
+                markerAnnounceImage.style.display = 'none';
             }
-        ];
-        
-        // セッションストレージから選択されたプロジェクトを取得
+
+            marker.addEventListener('markerFound', () => {
+                if (markerStatus) markerStatus.textContent = '検出中';
+                if (markerAnnounceImage) {
+                    markerAnnounceImage.style.display = 'none';
+                }
+
+                if (canPlayVideo) {
+                    projectVideoEntity.setAttribute('visible', 'true');
+                    projectVideo.play().catch(e => console.error("Video play error after marker found:", e));
+                    console.log('Marker found, attempting to play video.');
+                } else {
+                    console.log('Marker found, but video cannot play yet.');
+                    if (!canPlayVideo) console.log('Reason: Video not ready (canPlayVideo=false)');
+                    if (errorMessage) errorMessage.textContent = '動画の準備ができていません。';
+                }
+            });
+
+            marker.addEventListener('markerLost', () => {
+                if (markerStatus) markerStatus.textContent = '消失';
+                if (projectVideo) {
+                    projectVideo.pause();
+                    projectVideoEntity.setAttribute('visible', 'false');
+                }
+                if (markerAnnounceImage) {
+                    markerAnnounceImage.style.display = 'flex';
+                }
+            });
+
+            if (selectedProject && selectedProject.dir) {
+                const playPromise = projectVideo.play();
+                if (playPromise !== undefined) {
+                    playPromise.then(() => {
+                        projectVideo.pause();
+                        projectVideo.currentTime = 0;
+                        console.log("User interaction registered. Ready for audio playback.");
+                    }).catch(error => {
+                        console.warn("Initial muted play attempt failed, but interaction registered.", error);
+                    });
+                }
+            }
+
+            if (sceneEl && !sceneEl.hasLoaded) {
+                 console.log('A-Frame scene not loaded yet, user interaction occurred.');
+            }
+
+        }, { once: true });
+
         const selectedProjectIndex = sessionStorage.getItem('selectedProject') || 0;
-        const selectedProject = projectsData[selectedProjectIndex];
+        const selectedProject = projects[selectedProjectIndex];
         
-        // デバッグ情報を更新
-        currentProject.textContent = selectedProject ? `${selectedProject.name} - ${selectedProject.keyword}` : 'なし';
-        
-        // 動画ソースを設定
-        if (selectedProject && selectedProject.dir) {
-            const videoPath = `/items/${selectedProject.dir}/movie.webm`;
-            projectVideo.src = videoPath;
-            projectVideo.load();
-            videoLoadStatus.textContent = '読込中...';
-            
-            projectVideo.onloadeddata = () => {
-                videoLoadStatus.textContent = '読込完了';
-            };
-            
-            projectVideo.onerror = (e) => {
-                videoLoadStatus.textContent = '読込失敗';
-                errorMessage.textContent = `動画(${videoPath})の読み込みに失敗しました`;
-                console.error(`動画(${videoPath})の読み込みに失敗しました:`, e);
-            };
+        if (currentProject) {
+            currentProject.textContent = selectedProject ? `${selectedProject.name} - ${selectedProject.keyword}` : 'なし';
         }
         
-        // テキスト表示を設定
         if (selectedProject) {
             projectText.setAttribute('text', {
                 value: `${selectedProject.name}\n${selectedProject.keyword}`,
@@ -139,26 +166,50 @@ import { projects } from '../data/projects.js';
                 width: 5,
                 color: 'black'
             });
-            textLoadStatus.textContent = '読込完了';
+            if (textLoadStatus) textLoadStatus.textContent = '読込完了';
+        } else {
+            if (textLoadStatus) textLoadStatus.textContent = 'エラー';
         }
 
-        marker.addEventListener('markerFound', () => {
-            projectVideo.play();
-            markerStatus.textContent = '検出中';
+        if (selectedProject && selectedProject.dir) {
+            const videoPath = `/items/${selectedProject.dir}/movie.mov`;
+            projectVideo.src = videoPath;
+            if (videoLoadStatus) videoLoadStatus.textContent = '準備中...';
+            
+            projectVideo.onloadeddata = () => {
+                if (videoLoadStatus) videoLoadStatus.textContent = 'データ読込完了';
+            };
+            
+            projectVideo.oncanplay = () => {
+                if (videoLoadStatus) videoLoadStatus.textContent = '再生準備完了';
+                canPlayVideo = true;
+            };
+            
+            projectVideo.onerror = (e) => {
+                console.error(`動画(${videoPath})の読み込み/再生エラー:`, e);
+                console.error('エラーオブジェクト:', projectVideo.error);
+
+                if (videoLoadStatus) videoLoadStatus.textContent = `読込失敗 (${projectVideo.error?.code || 'unknown'})`;
+                if (errorMessage) errorMessage.textContent = `動画(${videoPath})の読み込みに失敗しました。詳細: ${projectVideo.error?.message || '不明なエラー'}`;
+            };
+            projectVideo.load();
+        } else {
+            if (errorMessage) errorMessage.textContent = '選択されたプロジェクト情報が見つかりません。';
+            console.error('選択されたプロジェクト情報が見つかりません:', selectedProjectIndex, projects);
+            if (videoLoadStatus) videoLoadStatus.textContent = 'エラー';
+            if (textLoadStatus) textLoadStatus.textContent = 'エラー';
+        }
+
+        projectVideo.addEventListener('ended', () => {
+            thankYouContainer.classList.add('visible');
+            
+            sessionStorage.setItem('selectedProject', selectedProjectIndex);
         });
 
-        marker.addEventListener('markerLost', () => {
-            projectVideo.pause();
-            markerStatus.textContent = '未検出';
-        });
-        
-        // 動画再生終了時の処理
-        projectVideo.addEventListener('ended', () => {
-            // お礼メッセージを表示
-            thankYouContainer.style.display = 'block';
-            
-            // 選択されたプロジェクトをメッセージページ用に保存
-            sessionStorage.setItem('selectedProject', selectedProjectIndex);
+        const debugElements = [markerStatus, currentProject, textLoadStatus, videoLoadStatus, errorMessage];
+        debugElements.forEach(el => {
+            if (!el) {
+            }
         });
     });
 </script>
@@ -244,5 +295,39 @@ import { projects } from '../data/projects.js';
         max-width: 100%;
         max-height: 100%;
         object-fit: contain;
+    }
+
+    /* ★ 追加: thankYouContainer の初期スタイル */
+    #thankYouContainer {
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.5s ease-in-out, visibility 0.5s ease-in-out;
+    }
+
+    /* ★ 追加: thankYouContainer 表示時のスタイル */
+    #thankYouContainer.visible {
+        opacity: 1;
+        visibility: visible;
+    }
+
+    /* ★ 更新: #messageButton のスタイルを共通クラスに移動 */
+    .thank-you-button {
+        display: inline-block;
+        background-color: #4caf50;
+        color: white;
+        padding: 0.75rem 1.5rem;
+        border-radius: 2rem;
+        text-decoration: none;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        border: none;
+        cursor: pointer;
+        min-width: 180px; /* ボタン幅を揃える */
+    }
+
+    /* ★ 更新: ホバー効果も共通クラスに */
+    .thank-you-button:hover {
+        background-color: #3d9140;
+        transform: translateY(-2px);
     }
 </style>
