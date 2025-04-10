@@ -1,11 +1,10 @@
-// import { saveMessage } from '../../db/messages.js'; // SQLiteは使わないのでコメントアウトまたは削除
 import { projects } from '../../data/projects.js'; // プロジェクト名取得のためにインポート
 
 // ステップ1でコピーしたGoogle Apps ScriptのWebアプリURLをここに貼り付け
 const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyiSJ660RQD7LVRLk5fthYR6_46p4c8wd9Dzj2V7i8ykdCsHCON3GQHonz4pCSDL82E/exec';
 
-// この行を追加 (方法Aの場合)
-export const prerender = false;
+// // この行を追加 (方法Aの場合)
+// export const prerender = false; // ← この行を削除またはコメントアウト
 
 // 関数名を post から POST に変更
 export async function POST({ request }) {
