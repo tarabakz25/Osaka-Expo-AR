@@ -48,8 +48,8 @@ let projects = [
 			<div class="logo-container">
 				<Image src={KamiyamaLogo} alt="Kamiyama Logo" class="kamiyama-logo" />
 			</div>
-			<h1 class="welcome-title" data-ja="大阪・関西万博徳島パビリオン 神山まるごと高専エリアへようこそ" data-en="Welcome to Kamiyama KOSEN Area at the Osaka-Kansai Expo Tokushima Pavilion">大阪・関西万博徳島パビリオン 神山まるごと高専エリアへようこそ</h1>
-			<button class="start-button" id="startButton" data-ja="次へ" data-en="Next">次へ</button>
+			<h1 class="welcome-title">Connect with Kamiyama Marugoto Collage.</h1>
+			<h1 class="welcome-title">神山まるごと高専とつながる。</h1>
 		</div>
 	</div>
 	<div class="explain_text-page" id="explainPage">
@@ -57,7 +57,6 @@ let projects = [
 			<h2 data-ja="このプロジェクトは？" data-en="About This Project">このプロジェクトは？</h2>
 			<p data-ja="ここでは、私たち神山まるごと高専生がARを通じて、神山まるごと高専の今を伝えるためのプロジェクトです。" data-en="In this project, we, the students of Kamiyama KOSEN, use AR technology to share what's happening at our school right now.">ここでは、私たち神山まるごと高専生がARを通じて、神山まるごと高専の今を伝えるためのプロジェクトです。</p>
 			<p data-ja="目の前にあるマネキンにかざして、実際に神山まるごと高専の今を見てみてください。" data-en="Hold your device up to the mannequin in front of you to experience the current state of Kamiyama KOSEN.">目の前にあるマネキンにかざして、実際に神山まるごと高専の"今"を体験してみましょう。</p>
-			<button class="ar-button" id="toSelectPage" data-ja="次へ" data-en="Next">次へ</button>
 		</div>
 	</div>
 	<div class="movie_select-page" id="movieSelectPage">
@@ -155,11 +154,34 @@ let projects = [
 		const explainPage = document.getElementById('explainPage');
 		const movieSelectPage = document.getElementById('movieSelectPage');
 		
-		// ボタン要素
-		const startButton = document.getElementById('startButton');
-		const arButton = document.querySelector('.ar-button');
+		// 自動遷移のタイミング設定（ミリ秒）
+		const timings = {
+			landing: 3000,    // ランディングページの表示時間
+			explain: 5000     // 説明ページの表示時間
+		};
 		
-		// スライダー関連の要素
+		// ページ遷移関数
+		function transitionToExplain() {
+			landingPage.classList.add('fade-out');
+			explainPage.classList.add('fade-in');
+			
+			// 次のページへの遷移をスケジュール
+			setTimeout(transitionToMovieSelect, timings.explain);
+		}
+		
+		function transitionToMovieSelect() {
+			explainPage.classList.remove('fade-in');
+			explainPage.classList.add('fade-out');
+			movieSelectPage.classList.add('fade-in');
+			
+			// カードスライドの初期化
+			updateSlides();
+		}
+		
+		// 自動遷移を開始
+		setTimeout(transitionToExplain, timings.landing);
+		
+		// スライダー関連の要素と処理
 		const cardSlides = document.querySelectorAll('.card-slide');
 		const dots = document.querySelectorAll('.dot');
 		const cardSlider = document.getElementById('cardSlider');
@@ -256,38 +278,6 @@ let projects = [
 				dots[0].classList.add('active');
 			}
 		}
-		
-		// ページ1からページ2への遷移
-		if (startButton) {
-			startButton.addEventListener('click', function() {
-				console.log("スタートボタンがクリックされました");
-				landingPage.classList.add('fade-out');
-				explainPage.classList.add('fade-in');
-			});
-		}
-		
-		// ページ2からページ3（カード選択）への遷移
-		if (arButton) {
-			arButton.addEventListener('click', function(e) {
-				e.preventDefault();
-				console.log("次へボタンがクリックされました");
-				explainPage.classList.remove('fade-in');
-				explainPage.classList.add('fade-out');
-				movieSelectPage.classList.add('fade-in');
-				
-				// カードスライドの初期化
-				updateSlides();
-			});
-		}
-		
-		// ドットをクリックして特定のカードへ移動
-		dots.forEach((dot, index) => {
-			dot.addEventListener('click', function() {
-				const direction = index > currentIndex ? 'left' : 'right';
-				currentIndex = index;
-				updateSlides(direction);
-			});
-		});
 		
 		// スライドの状態を更新（アニメーション方向を考慮）
 		function updateSlides(direction = '') {
