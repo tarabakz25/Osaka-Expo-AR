@@ -3,6 +3,7 @@ import { Image } from "astro:assets"
 import ARLayout from '../layouts/ARLayout.astro';
 import MarkerAnnounce from '../assets/marker-announce.svg';
 import { projects } from '../data/projects.js';
+import '../styles/ar.css';
 ---
 
 <ARLayout>    
@@ -31,11 +32,20 @@ import { projects } from '../data/projects.js';
         </div> -->
         
         <!-- 動画再生後のお礼メッセージ -->
-        <div id="thankYouContainer" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 30; background-color: rgba(0, 0, 0, 0.8); color: white; padding: 2em; border-radius: 1em; text-align: center; max-width: 80%;">
+        <div id="thankYouContainer">
             <h2>ご視聴ありがとうございました！</h2>
             <p>学生の作品はいかがでしたか？</p>
             <p>良ければ、学生へのメッセージをお願いします。</p>
-            <a href="/message" id="messageButton" style="display: inline-block; margin-top: 1em; background-color: #4caf50; color: white; padding: 0.75rem 1.5rem; border-radius: 2rem; text-decoration: none; font-size: 1rem;">メッセージを送る</a>
+            <div class="project-selection">
+                <p>他の作品も見てみませんか？</p>
+                <select id="projectSelector">
+                    {projects.map((project, index) => (
+                        <option value={index}>{project.name} - {project.keyword}</option>
+                    ))}
+                </select>
+                <button id="watchAgainButton">見る</button>
+            </div>
+            <a href="/message" id="messageButton">メッセージを送る</a>
         </div>
         
         <div id="arjs-scene">
@@ -54,7 +64,7 @@ import { projects } from '../data/projects.js';
                 <a-entity
                     id="mizutamaEntity"
                     gltf-model="#mizutamaModel"
-                    scale="0.01 0.01 0.01"
+                    scale="1 1 1"
                     position="0 0 0"
                     rotation="0 0 0"
                     visible="true">
@@ -63,8 +73,8 @@ import { projects } from '../data/projects.js';
                 <a-marker type="pattern" url='/pattern-test.patt' id="patternMarker">
                     <a-entity
                         id="projectText"
-                        scale="1 1 1"
-                        position="3 -3 0"
+                        scale="2 2 2"
+                        position="0 0 0"
                         text="value: テスト表示; align: center; width: 2; color: black;"
                         visible="true">
                     </a-entity>
@@ -213,6 +223,31 @@ import { projects } from '../data/projects.js';
             sessionStorage.setItem('selectedProject', selectedProjectIndex);
         });
 
+        // 他のプロジェクトを見るための処理
+        const projectSelector = document.getElementById('projectSelector');
+        const watchAgainButton = document.getElementById('watchAgainButton');
+        
+        if (projectSelector && watchAgainButton) {
+            // 現在選択されているプロジェクトをデフォルト選択に
+            projectSelector.value = selectedProjectIndex;
+            
+            watchAgainButton.addEventListener('click', () => {
+                const newProjectIndex = projectSelector.value;
+                sessionStorage.setItem('selectedProject', newProjectIndex);
+                
+                // お礼メッセージを非表示
+                thankYouContainer.style.display = 'none';
+                
+                // マーカーガイドを表示
+                if (markerAnnounceImage) {
+                    markerAnnounceImage.style.display = 'flex';
+                }
+                
+                // 再読み込みして新しいプロジェクトの動画を準備
+                location.reload();
+            });
+        }
+
         const debugElements = [markerStatus, currentProject, textLoadStatus, videoLoadStatus, errorMessage];
         debugElements.forEach(el => {
             if (!el) {
@@ -220,87 +255,3 @@ import { projects } from '../data/projects.js';
         });
     });
 </script>
-
-<style>
-    #arjsContent {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        z-index: 10;
-    }
-    
-    #loadingMessage {
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        z-index: 20;
-        background-color: rgba(0, 0, 0, 0.7);
-        color: white;
-        padding: 1em;
-        border-radius: 0.5em;
-        text-align: center;
-        font-size: 1.2em;
-    }
-    
-    #backButton {
-        position: fixed;
-        top: 20px;
-        left: 20px;
-        z-index: 20;
-        background-color: rgba(0, 0, 0, 0.5);
-        color: white;
-        padding: 0.5em 1em;
-        border-radius: 0.5em;
-        text-decoration: none;
-        font-size: 1em;
-    }
-    
-    #arjs-scene {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        z-index: 1;
-    }
-    
-    #messageButton {
-        display: inline-block;
-        background-color: #4caf50;
-        color: white;
-        padding: 0.75rem 1.5rem;
-        border-radius: 2rem;
-        text-decoration: none;
-        font-size: 1rem;
-        transition: all 0.3s ease;
-        border: none;
-        cursor: pointer;
-    }
-    
-    #messageButton:hover {
-        background-color: #3d9140;
-        transform: translateY(-2px);
-    }
-    
-    .marker-image {
-        position: fixed;
-        top: 70%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        width: 250px;
-        height: 250px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        z-index: 20;
-    }
-    
-    .marker-image img {
-        max-width: 100%;
-        max-height: 100%;
-        object-fit: contain;
-    }
-</style>
