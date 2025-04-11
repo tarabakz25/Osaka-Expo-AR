@@ -1,6 +1,5 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
-import node from '@astrojs/node'; // Nodeアダプターをインポート
 
 // https://astro.build/config
 export default defineConfig({
@@ -12,5 +11,7 @@ export default defineConfig({
           "inviting-mostly-badger.ngrok-free.app",
           'finer-clever-aphid.ngrok-free.app'
         ]
-    }
+    },
+    output: 'static', 
+    site: 'https://expo2025.kamiyama.ac.jp', // サイトのURL
 });

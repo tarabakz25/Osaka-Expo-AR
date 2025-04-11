@@ -31,14 +31,11 @@ import { projects } from '../data/projects.js';
         </div> -->
         
         <!-- 動画再生後のお礼メッセージ -->
-        <div id="thankYouContainer" style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 30; background-color: rgba(0, 0, 0, 0.8); color: white; padding: 2em; border-radius: 1em; text-align: center; max-width: 80%;">
+        <div id="thankYouContainer" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 30; background-color: rgba(0, 0, 0, 0.8); color: white; padding: 2em; border-radius: 1em; text-align: center; max-width: 80%;">
             <h2>ご視聴ありがとうございました！</h2>
             <p>学生の作品はいかがでしたか？</p>
             <p>良ければ、学生へのメッセージをお願いします。</p>
-            <div class="button-container" style="margin-top: 1.5em; display: flex; justify-content: center; gap: 1em; flex-wrap: wrap;">
-                <a href="/message" id="messageButton" class="thank-you-button">メッセージを送る</a>
-                <a href="/" id="viewOtherProjectsButton" class="thank-you-button">他のプロジェクトを見る</a>
-            </div>
+            <a href="/message" id="messageButton" style="display: inline-block; margin-top: 1em; background-color: #4caf50; color: white; padding: 0.75rem 1.5rem; border-radius: 2rem; text-decoration: none; font-size: 1rem;">メッセージを送る</a>
         </div>
         
         <div id="arjs-scene">
@@ -53,7 +50,7 @@ import { projects } from '../data/projects.js';
                     <video id="projectVideo" src="" loop="false" playsinline></video>
                 </a-assets>
                 
-                <a-marker type="pattern" url='/pattern.patt' id="patternMarker">
+                <a-marker type="pattern" url='/pattern-test.patt' id="patternMarker">
                     <a-entity
                         id="projectText"
                         scale="1 1 1"
@@ -201,7 +198,7 @@ import { projects } from '../data/projects.js';
         }
 
         projectVideo.addEventListener('ended', () => {
-            thankYouContainer.classList.add('visible');
+            thankYouContainer.style.display = 'block';
             
             sessionStorage.setItem('selectedProject', selectedProjectIndex);
         });
@@ -295,39 +292,5 @@ import { projects } from '../data/projects.js';
         max-width: 100%;
         max-height: 100%;
         object-fit: contain;
-    }
-
-    /* ★ 追加: thankYouContainer の初期スタイル */
-    #thankYouContainer {
-        opacity: 0;
-        visibility: hidden;
-        transition: opacity 0.5s ease-in-out, visibility 0.5s ease-in-out;
-    }
-
-    /* ★ 追加: thankYouContainer 表示時のスタイル */
-    #thankYouContainer.visible {
-        opacity: 1;
-        visibility: visible;
-    }
-
-    /* ★ 更新: #messageButton のスタイルを共通クラスに移動 */
-    .thank-you-button {
-        display: inline-block;
-        background-color: #4caf50;
-        color: white;
-        padding: 0.75rem 1.5rem;
-        border-radius: 2rem;
-        text-decoration: none;
-        font-size: 1rem;
-        transition: all 0.3s ease;
-        border: none;
-        cursor: pointer;
-        min-width: 180px; /* ボタン幅を揃える */
-    }
-
-    /* ★ 更新: ホバー効果も共通クラスに */
-    .thank-you-button:hover {
-        background-color: #3d9140;
-        transform: translateY(-2px);
     }
 </style>

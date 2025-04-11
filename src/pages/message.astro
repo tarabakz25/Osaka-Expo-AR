@@ -68,7 +68,10 @@ import '../styles/message.css';
             dir: "hanabi"
         }
     ];
-    
+
+    // ステップ1でコピーしたGoogle Apps ScriptのWebアプリURLをここに貼り付け
+    const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyiSJ660RQD7LVRLk5fthYR6_46p4c8wd9Dzj2V7i8ykdCsHCON3GQHonz4pCSDL82E/exec'; // GAS URLをここに定義
+
     window.onload = function() {
         // パーティクルJS初期化
         particlesJS("particles-js", {
@@ -148,35 +151,65 @@ import '../styles/message.css';
             e.preventDefault();
             
             const formData = new FormData(messageForm);
-            const selectedProjectIndex = formData.get('projectName'); // selectから選択されたプロジェクトのインデックス
+            const selectedProjectIndexValue = formData.get('projectName'); // selectから選択されたプロジェクトのインデックス
             
-            const data = {
-                projectIndex: selectedProjectIndex,
-                name: formData.get('name'),
-                message: formData.get('message'),
-                timestamp: new Date().toISOString()
+            // projectIndexからプロジェクト名を取得
+            let projectName = '';
+            const selectedProject = projectsData[Number(selectedProjectIndexValue)]; // projectsDataからデータ取得
+            if (selectedProject) {
+                projectName = `${selectedProject.name} - ${selectedProject.keyword}`;
+            }
+            
+            // Google Apps Scriptに送信するデータペイロードを作成
+            const payload = {
+                timestamp: new Date().toISOString(),
+                projectIndex: selectedProjectIndexValue,
+                projectName: projectName, // プロジェクト名を追加
+                name: formData.get('name'),        // フォームからの名前
+                message: formData.get('message'),    // フォームからのメッセージ
             };
             
+            // Google Apps Script の Web アプリ URL が設定されているか確認
+            if (!GOOGLE_APPS_SCRIPT_URL) {
+                alert('送信先のURLが設定されていません。');
+                console.error('GOOGLE_APPS_SCRIPT_URL is not set.');
+                return; // URLがなければ処理を中断
+            }
+            
             try {
-                const response = await fetch('/api/save-message', {
+                // 直接 Google Apps Script の Web アプリにデータを POST 送信
+                const response = await fetch(GOOGLE_APPS_SCRIPT_URL, {
                     method: 'POST',
+                    // mode: 'no-cors', // GAS側でCORS設定が難しい場合の回避策だが、レスポンスは受け取れない
                     headers: {
-                        'Content-Type': 'application/json',
+                        // 'Content-Type': 'application/json', // GAS側が application/json を受け付ける場合
+                        'Content-Type': 'text/plain;charset=utf-8', // GAS doPost(e) で e.postData.contents を使う場合 text/plain が扱いやすいことがある
                     },
-                    body: JSON.stringify(data)
+                    body: JSON.stringify(payload) // GAS側で JSON.parse(e.postData.contents) する想定
                 });
                 
-                if (response.ok) {
+                // GASからのレスポンスを処理 (GASがJSONを返す想定)
+                // 注意: 'no-cors' モードでは response.ok や response.json() は機能しません。
+                //       GAS側で適切にCORSヘッダーを設定する必要があります。
+                //       もしCORSエラーが出る場合は、GAS側のdoPost関数で ContentService を使って
+                //       適切なヘッダーを返すように修正してください。
+                if (response.ok) { // レスポンスが正常 (200-299) かどうか
+                    // const result = await response.json(); // GASがJSONを返す場合
+                    // console.log('GAS Response:', result); // GASからの応答をログに出力
+                    
                     // 送信成功メッセージを表示
                     messageForm.style.display = 'none';
                     thankYouMessage.style.display = 'block';
+                    
                 } else {
-                    const errorData = await response.json();
-                    alert(`メッセージの送信に失敗しました: ${errorData.error || '不明なエラー'}`);
+                    // サーバー側 (GAS) でエラーが発生した場合
+                    console.error('GAS request failed:', response.status, response.statusText);
+                    // const errorData = await response.text(); // エラー内容をテキストで取得試行
+                    alert(`メッセージの送信に失敗しました。ステータス: ${response.status}`);
                 }
             } catch (error) {
-                console.error('エラーが発生しました:', error);
-                alert('エラーが発生しました。もう一度お試しください。');
+                console.error('送信中にエラーが発生しました:', error);
+                alert('エラーが発生しました。ネットワーク接続を確認するか、もう一度お試しください。');
             }
         });
     };
