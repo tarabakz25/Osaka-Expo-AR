@@ -48,7 +48,17 @@ import { projects } from '../data/projects.js';
                 <!-- アセット管理システム -->
                 <a-assets>
                     <video id="projectVideo" src="" loop="false" playsinline></video>
+                    <a-asset-item id="mizutamaModel" src="/mizutama_anim.glb"></a-asset-item>
                 </a-assets>
+
+                <a-entity
+                    id="mizutamaEntity"
+                    gltf-model="#mizutamaModel"
+                    scale="0.01 0.01 0.01"
+                    position="0 0 0"
+                    rotation="0 0 0"
+                    visible="true">
+                </a-entity>
                 
                 <a-marker type="pattern" url='/pattern-test.patt' id="patternMarker">
                     <a-entity
