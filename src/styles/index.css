@@ -141,8 +141,8 @@ body {
     font-family: var(--default-font);
 }
 
-.explain-content h2 {
-    font-size: 1.5rem;
+.explain-content h2 { 
+    font-size: 1.2rem;
     margin-bottom: 1rem;
 }
 
@@ -206,7 +206,7 @@ body {
     }
 
     .explain-content h2 {
-        font-size: 1.3rem;
+        font-size: 1rem;
     }
 
     .explain-content p {
