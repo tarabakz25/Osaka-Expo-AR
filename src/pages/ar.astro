@@ -12,9 +12,8 @@ import '../styles/ar.css';
     <div id="arjsContent">
         <!-- ★ 開始を促すオーバーレイを追加 -->
         <div id="startOverlay" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.7); color: white; display: flex; justify-content: center; align-items: center; z-index: 100; text-align: center; flex-direction: column; font-size: 1.2em; cursor: pointer;">
-            <p>AR体験を開始するには</p>
+            <p>ARを開始するには</p>
             <p>画面をタップしてください</p>
-            <p style="font-size: 0.8em; margin-top: 2em;">(タップ後にカメラへのアクセス許可を求められます)</p>
         </div>
         <!-- マーカー読み取り案内 -->
         <div class="marker-image">
@@ -43,7 +42,7 @@ import '../styles/ar.css';
                         <option value={index}>{project.name} - {project.keyword}</option>
                     ))}
                 </select>
-                <button id="watchAgainButton">見る</button>
+                <button id="watchAgainButton">start!</button>
             </div>
             <a href="/message" id="messageButton">メッセージを送る</a>
         </div>
@@ -58,24 +57,14 @@ import '../styles/ar.css';
                 <!-- アセット管理システム -->
                 <a-assets>
                     <video id="projectVideo" src="" loop="false" playsinline></video>
-                    <a-asset-item id="mizutamaModel" src="/mizutama_anim.glb"></a-asset-item>
                 </a-assets>
 
-                <a-entity
-                    id="mizutamaEntity"
-                    gltf-model="#mizutamaModel"
-                    scale="1 1 1"
-                    position="0 0 0"
-                    rotation="0 0 0"
-                    visible="true">
-                </a-entity>
-                
                 <a-marker type="pattern" url='/pattern-test.patt' id="patternMarker">
                     <a-entity
                         id="projectText"
                         scale="2 2 2"
-                        position="0 0 0"
-                        text="value: テスト表示; align: center; width: 2; color: black;"
+                        position="2 2 0"
+                        text="value: テスト表示; align: center; width: 2; color: white; background-color: rgba(0,0,0,0.8); wrapCount: 20;"
                         visible="true">
                     </a-entity>
                     <a-video
@@ -86,6 +75,7 @@ import '../styles/ar.css';
                         rotation="-45 0 0"
                         src="#projectVideo"
                         visible="false"
+                        opacity="0"
                         playsinline>
                     </a-video>
                 </a-marker>
@@ -115,40 +105,55 @@ import '../styles/ar.css';
         let canPlayVideo = false;
         let userInteracted = false;
 
-        startOverlay.addEventListener('click', () => {
-            userInteracted = true;
-            startOverlay.style.display = 'none';
+        // マーカー検出のイベントハンドラを変数に格納
+        const markerFoundHandler = () => {
+            if (markerStatus) markerStatus.textContent = '検出中';
             if (markerAnnounceImage) {
                 markerAnnounceImage.style.display = 'none';
             }
 
-            marker.addEventListener('markerFound', () => {
-                if (markerStatus) markerStatus.textContent = '検出中';
-                if (markerAnnounceImage) {
-                    markerAnnounceImage.style.display = 'none';
-                }
+            if (canPlayVideo) {
+                projectVideoEntity.setAttribute('visible', 'true');
+                projectVideoEntity.setAttribute('animation', {
+                    property: 'opacity',
+                    from: 0,
+                    to: 1, 
+                    dur: 1000,
+                    easing: 'easeOutCubic'
+                });
+                projectVideo.play().catch(e => console.error("Video play error after marker found:", e));
+                console.log('Marker found, attempting to play video.');
+            } else {
+                console.log('Marker found, but video cannot play yet.');
+                if (!canPlayVideo) console.log('Reason: Video not ready (canPlayVideo=false)');
+                if (errorMessage) errorMessage.textContent = '動画の準備ができていません。';
+            }
+        };
 
-                if (canPlayVideo) {
-                    projectVideoEntity.setAttribute('visible', 'true');
-                    projectVideo.play().catch(e => console.error("Video play error after marker found:", e));
-                    console.log('Marker found, attempting to play video.');
-                } else {
-                    console.log('Marker found, but video cannot play yet.');
-                    if (!canPlayVideo) console.log('Reason: Video not ready (canPlayVideo=false)');
-                    if (errorMessage) errorMessage.textContent = '動画の準備ができていません。';
-                }
-            });
+        const markerLostHandler = () => {
+            if (markerStatus) markerStatus.textContent = '消失';
+            if (projectVideo) {
+                projectVideo.pause();
+                projectVideoEntity.setAttribute('animation', {
+                    property: 'opacity',
+                    from: 1,
+                    to: 0, 
+                    dur: 500,
+                    easing: 'easeInCubic',
+                    onComplete: () => projectVideoEntity.setAttribute('visible', 'false')
+                });
+            }
+            if (markerAnnounceImage) {
+                markerAnnounceImage.style.display = 'flex';
+            }
+        };
 
-            marker.addEventListener('markerLost', () => {
-                if (markerStatus) markerStatus.textContent = '消失';
-                if (projectVideo) {
-                    projectVideo.pause();
-                    projectVideoEntity.setAttribute('visible', 'false');
-                }
-                if (markerAnnounceImage) {
-                    markerAnnounceImage.style.display = 'flex';
-                }
-            });
+        startOverlay.addEventListener('click', () => {
+            userInteracted = true;
+            startOverlay.style.display = 'none';
+
+            marker.addEventListener('markerFound', markerFoundHandler);
+            marker.addEventListener('markerLost', markerLostHandler);
 
             if (selectedProject && selectedProject.dir) {
                 const playPromise = projectVideo.play();
@@ -218,7 +223,24 @@ import '../styles/ar.css';
         }
 
         projectVideo.addEventListener('ended', () => {
+            // ARマーカー検知を停止するためにイベントリスナーを削除
+            marker.removeEventListener('markerFound', markerFoundHandler);
+            marker.removeEventListener('markerLost', markerLostHandler);
+            
+            // マーカー案内画像を非表示
+            if (markerAnnounceImage) {
+                markerAnnounceImage.style.display = 'none';
+            }
+            
+            // お礼メッセージをアニメーションで表示
+            thankYouContainer.style.opacity = '0';
             thankYouContainer.style.display = 'block';
+            
+            // CSSトランジションでフェードイン
+            setTimeout(() => {
+                thankYouContainer.style.transition = 'opacity 1.5s ease-in-out';
+                thankYouContainer.style.opacity = '1';
+            }, 100);
             
             sessionStorage.setItem('selectedProject', selectedProjectIndex);
         });
