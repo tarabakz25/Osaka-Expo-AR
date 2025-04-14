@@ -7,34 +7,18 @@ import '../styles/index.css'
 import BusinessCard from "../components/BusinessCard.astro"
 import { projects } from '../data/projects.js'
 
-// メンバー情報を追加
-let projects = [
-	{
-		name: "松井ひなこ",
-		romaji: "MATSUI HINAKO",
-		keyword: "パフェに甘えて"
-	},
-	{
-		name: "林美羽",
-		romaji: "HAYASHI MIU",
-		keyword: "わかめプロジェクト"
-	},
-	{
-		name: "花火",
-		romaji: "HANABI",
-		keyword: "FRCロボコン"
-	}
-];
-
 // プロジェクト配列をシャッフル
-// for (let i = projects.length - 1; i > 0; i--) {
-// 	const j = Math.floor(Math.random() * (i + 1));
-// 	[projects[i], projects[j]] = [projects[j], projects[i]];
-// }
+for (let i = projects.length - 1; i > 0; i--) {
+	const j = Math.floor(Math.random() * (i + 1));
+	[projects[i], projects[j]] = [projects[j], projects[i]];
+}
 ---
 
 <Layout>
 	<div id="particles-js" class="particles-container"></div>
+	
+	<!-- 波紋エフェクト用の要素 -->
+	<div id="ripple-effect" class="ripple-container"></div>
 	
 	<!-- 言語切り替えボタン -->
 	<div class="language-switch">
@@ -45,11 +29,11 @@ let projects = [
 	
 	<div class="landing-page">
 		<div class="landing-content">
-			<div class="logo-container">
+			<div class="logo-container dissolve">
 				<Image src={KamiyamaLogo} alt="Kamiyama Logo" class="kamiyama-logo" />
 			</div>
-			<h1 class="welcome-title">Connect with Kamiyama Marugoto Collage.</h1>
-			<h1 class="welcome-title">神山まるごと高専とつながる。</h1>
+			<h1 class="welcome-title dissolve" style="animation-delay: 0.5s;">Connect with Kamiyama Marugoto Collage.</h1>
+			<h1 class="welcome-title dissolve" style="animation-delay: 1s;">神山まるごと高専とつながる。</h1>
 		</div>
 	</div>
 	<div class="explain_text-page" id="explainPage">
@@ -86,10 +70,122 @@ let projects = [
 	</div>
 </Layout>
 
+<!-- jQuery と ripples プラグインの読み込み -->
+<script is:inline src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script is:inline src="https://cdn.jsdelivr.net/npm/jquery.ripples@0.6.3/dist/jquery.ripples.min.js"></script>
 <script is:inline src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
 
-<script is:inline>
+<style>
+	/* 波紋エフェクト用のスタイル */
+	.ripple-container {
+		position: fixed;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		z-index: 90;
+		background-color: transparent; /* 背景色を透明に変更 */
+		pointer-events: none;
+	}
+	
+	/* ロゴと歓迎テキストのスタイル */
+	.logo-container.hidden {
+		opacity: 0;
+	}
+	
+	.logo-container.fade-in {
+		animation: logo-fade-in 1.5s ease forwards;
+	}
+	
+	@keyframes logo-fade-in {
+		0% {
+			opacity: 0;
+		}
+		100% {
+			opacity: 1;
+		}
+	}
+	
+	/* タイトルのディゾルブエフェクト */
+	.welcome-title.hidden {
+		opacity: 0;
+	}
+	
+	.welcome-title.fade-in {
+		animation: fade-in 1.5s ease forwards;
+	}
+	
+	@keyframes fade-in {
+		0% {
+			opacity: 0;
+		}
+		100% {
+			opacity: 1;
+		}
+	}
+	
+	/* コンテンツをより見やすくするためのスタイル追加 */
+	.landing-content {
+		position: relative;
+		z-index: 95;
+		padding: 20px;
+		border-radius: 10px;
+		max-width: 800px;
+		margin: 0 auto;
+	}
+	
+	.welcome-title {
+		color: white;
+		text-shadow: 0 0 10px rgba(0, 0, 0, 0.5); /* テキストにシャドウを追加して読みやすく */
+		margin: 15px 0;
+	}
+	
+	.kamiyama-logo {
+		max-width: 280px;
+		margin: 0 auto;
+		display: block;
+	}
+	
+	/* ページ遷移アニメーション */
+	.fade-out {
+		opacity: 0;
+		transition: opacity 1.5s ease;
+		pointer-events: none;
+	}
+
+	.fade-in {
+		opacity: 1;
+		transition: opacity 1.5s ease;
+	}
+
+	.landing-page, .explain_text-page, .movie_select-page {
+		transition: opacity 1.5s ease;
+	}
+
+	.explain_text-page, .movie_select-page {
+		opacity: 0;
+	}
+	
+	/* ディゾルブアニメーション */
+	.dissolve {
+		opacity: 0;
+		animation: dissolve-in 2s ease forwards;
+	}
+	
+	@keyframes dissolve-in {
+		0% {
+			opacity: 0;
+		}
+		100% {
+			opacity: 1;
+		}
+	}
+</style>
+
+<script is:inline define:vars={{ projects }}>
+
 	window.onload = function() {
+		// パーティクルJS初期化
 		particlesJS("particles-js", {
 		  "particles": {
 			"number": {
@@ -100,17 +196,17 @@ let projects = [
 			  }
 			},
 			"color": {
-			  "value": "#A5DFFF"
+			  "value": "#6FB8E3" /* パーティクルの色を濃いめの青に変更 */
 			},
 			"shape": {
 			  "type": "circle",
 			  "stroke": {
 				"width": 0,
-				"color": "#A5DFFF"
+				"color": "#6FB8E3" /* こちらも同じ色に変更 */
 			  }
 			},
 			"opacity": {
-			  "value": 0.8,
+			  "value": 0.5, /* 不透明度を下げる */
 			  "random": true
 			},
 			"size": {
@@ -126,7 +222,7 @@ let projects = [
 			},
 			"move": {
 			  "enable": true,
-			  "speed": 1,
+			  "speed": 0.5,
 			  "direction": "top",
 			  "random": true,
 			  "straight": false
@@ -148,7 +244,47 @@ let projects = [
 		  },
 		  "retina_detect": true
 		});
+		
+		// jQuery.ripples の初期化
+		try {
+			$('#ripple-effect').ripples({
+				resolution: 500, 
+				dropRadius: 20,  // 波紋の大きさを大きく
+				perturbance: 0.15 // 波紋の揺れを強く
+			});
+			
+			// 自動で波紋を発生させる（初期表示用）
+			setTimeout(function() {
+				// 画面中央に波紋を発生
+				const centerX = $('#ripple-effect').width() / 2;
+				const centerY = $('#ripple-effect').height() / 2;
+				
+				$('#ripple-effect').ripples('drop', centerX, centerY, 20, 0.25); // サイズと強度を上げる
+				setTimeout(function() {$('#ripple-effect').ripples('drop', centerX, centerY, 20, 0.25);}, 300);
+				setTimeout(function() {$('#ripple-effect').ripples('drop', centerX, centerY, 20, 0.25);}, 600);
+			}, 300);
+		} catch (e) {
+			console.error('Wave effects not supported by browser:', e);
+		}
 
+		// コンテンツ表示の制御
+		const logoContainer = document.querySelector('.logo-container');
+		const welcomeTitles = document.querySelectorAll('.welcome-title');
+		
+		// ロゴとテキストを波紋エフェクト後に表示（遅延を3秒に短縮）
+		setTimeout(() => {
+			// ロゴとテキストを同時に表示して、アニメーション効果を適用
+			logoContainer.classList.remove('hidden');
+			logoContainer.classList.add('fade-in');
+			
+			welcomeTitles.forEach((title, index) => {
+				// タイトルを同時に表示
+				title.classList.remove('hidden');
+				title.classList.add('fade-in');
+			});
+			
+		}, 3000); // 波紋エフェクトが完了した後にコンテンツを表示（短縮）
+		
 		// ページ切り替え用の要素
 		const landingPage = document.querySelector('.landing-page');
 		const explainPage = document.getElementById('explainPage');
@@ -156,12 +292,13 @@ let projects = [
 		
 		// 自動遷移のタイミング設定（ミリ秒）
 		const timings = {
-			landing: 3000,    // ランディングページの表示時間
-			explain: 5000     // 説明ページの表示時間
+			landing: 500,    // ランディングページの表示時間を短縮
+			explain: 3000      // 説明ページの表示時間を延長
 		};
 		
 		// ページ遷移関数
 		function transitionToExplain() {
+			console.log("説明ページへ遷移します");
 			landingPage.classList.add('fade-out');
 			explainPage.classList.add('fade-in');
 			
@@ -170,6 +307,7 @@ let projects = [
 		}
 		
 		function transitionToMovieSelect() {
+			console.log("動画選択ページへ遷移します");
 			explainPage.classList.remove('fade-in');
 			explainPage.classList.add('fade-out');
 			movieSelectPage.classList.add('fade-in');
@@ -178,8 +316,10 @@ let projects = [
 			updateSlides();
 		}
 		
-		// 自動遷移を開始
-		setTimeout(transitionToExplain, timings.landing);
+		// タイトルアニメーション完了後に自動遷移を開始するための計算時間も調整
+		// 波紋(3000ms) + コンテンツ表示(1000ms) + 表示後の余裕(1000ms) = 5000ms
+		const totalAnimationTime = 5000;
+		setTimeout(transitionToExplain, totalAnimationTime + timings.landing);
 		
 		// スライダー関連の要素と処理
 		const cardSlides = document.querySelectorAll('.card-slide');
@@ -228,10 +368,17 @@ let projects = [
 		// アクティブなカードをタップしたときの処理
 		function handleCardTap() {
 			console.log("カードがタップされました:", currentIndex);
+			// デバッグ情報を追加
+			console.log("選択されたプロジェクト:", projects[currentIndex]);
+			
 			// 選択されたプロジェクトのインデックスをセッションストレージに保存
 			sessionStorage.setItem('selectedProject', currentIndex);
-			// AR画面へ遷移
-			window.location.href = "/ar";
+			console.log("sessionStorageに保存しました", sessionStorage.getItem('selectedProject'));
+			
+			// 少し遅延させてAR画面へ遷移
+			setTimeout(() => {
+				window.location.href = "/ar";
+			}, 100);
 		}
 		
 		// クリックイベントもサポート（PCユーザー向け）
@@ -351,5 +498,12 @@ let projects = [
 				element.textContent = element.getAttribute(`data-${lang}`);
 			});
 		}
+
+		// 波紋エフェクトの後にディゾルブアニメーションを開始
+		setTimeout(() => {
+			document.querySelectorAll('.dissolve').forEach(element => {
+				element.style.animationPlayState = 'running';
+			});
+		}, 2000);
 	};
 </script>
