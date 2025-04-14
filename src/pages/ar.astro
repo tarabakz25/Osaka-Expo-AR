@@ -15,9 +15,12 @@ import '../styles/ar.css';
             <p>ARを開始するには</p>
             <p>画面をタップしてください</p>
         </div>
-        <!-- マーカー読み取り案内 -->
-        <div class="marker-image">
-            <Image src={MarkerAnnounce} alt="マーカー読み取り案内" width={250} height={250} />
+
+        <!-- マーカー案内画像 -->
+        <div id="markerGuide">
+            <div class="marker-image-container">
+                <Image src={MarkerAnnounce} alt="マーカー案内" width="300" height="300" />
+            </div>
         </div>
     
         <!-- デバッグ情報表示エリア -->
@@ -35,16 +38,16 @@ import '../styles/ar.css';
             <h2>ご視聴ありがとうございました！</h2>
             <p>学生の作品はいかがでしたか？</p>
             <p>良ければ、学生へのメッセージをお願いします。</p>
+            <a href="/message" id="messageButton">Send Message!</a>
             <div class="project-selection">
-                <p>他の作品も見てみませんか？</p>
+                <p>他の作品も見ますか？</p>
                 <select id="projectSelector">
                     {projects.map((project, index) => (
                         <option value={index}>{project.name} - {project.keyword}</option>
                     ))}
                 </select>
-                <button id="watchAgainButton">start!</button>
+                <button id="watchAgainButton">Start!</button>
             </div>
-            <a href="/message" id="messageButton">メッセージを送る</a>
         </div>
         
         <div id="arjs-scene">
@@ -71,7 +74,7 @@ import '../styles/ar.css';
                         id="projectVideoEntity"
                         width="6"
                         height="2"
-                        position="0 0 0"
+                        position="-1 0 0"
                         rotation="-45 0 0"
                         src="#projectVideo"
                         visible="false"
@@ -82,6 +85,13 @@ import '../styles/ar.css';
                 <!-- カメラ -->
                 <a-entity camera></a-entity>
             </a-scene>
+        </div>
+        
+        <!-- 位置調整ガイド -->
+
+        <div class="position-guide">
+            <h2>マネキン上のマーカーを写して見てください！</h2>
+            <p>画面で動画の左右の位置を調節できます。<br>動画が大きすぎる時は、少し離れて見て見てください。</p>
         </div>
     </div>
 </ARLayout>
@@ -99,7 +109,7 @@ import '../styles/ar.css';
         const thankYouContainer = document.getElementById('thankYouContainer');
         const errorMessage = document.getElementById('errorMessage');
         const startOverlay = document.getElementById('startOverlay');
-        const markerAnnounceImage = document.querySelector('.marker-image');
+        const markerGuide = document.getElementById('markerGuide');
         const sceneEl = document.querySelector('a-scene');
         
         let canPlayVideo = false;
@@ -108,8 +118,8 @@ import '../styles/ar.css';
         // マーカー検出のイベントハンドラを変数に格納
         const markerFoundHandler = () => {
             if (markerStatus) markerStatus.textContent = '検出中';
-            if (markerAnnounceImage) {
-                markerAnnounceImage.style.display = 'none';
+            if (markerGuide) {
+                markerGuide.style.display = 'none';
             }
 
             if (canPlayVideo) {
@@ -143,14 +153,24 @@ import '../styles/ar.css';
                     onComplete: () => projectVideoEntity.setAttribute('visible', 'false')
                 });
             }
-            if (markerAnnounceImage) {
-                markerAnnounceImage.style.display = 'flex';
+            if (markerGuide) {
+                markerGuide.style.display = 'flex';
             }
         };
 
         startOverlay.addEventListener('click', () => {
             userInteracted = true;
             startOverlay.style.display = 'none';
+
+            // マーカー読み取り案内を1秒後にディゾルブで表示
+            setTimeout(() => {
+                if (markerGuide) {
+                    markerGuide.style.display = 'flex';
+                    setTimeout(() => {
+                        markerGuide.style.opacity = '1';
+                    }, 50);
+                }
+            }, 1500);
 
             marker.addEventListener('markerFound', markerFoundHandler);
             marker.addEventListener('markerLost', markerLostHandler);
@@ -228,8 +248,8 @@ import '../styles/ar.css';
             marker.removeEventListener('markerLost', markerLostHandler);
             
             // マーカー案内画像を非表示
-            if (markerAnnounceImage) {
-                markerAnnounceImage.style.display = 'none';
+            if (markerGuide) {
+                markerGuide.style.display = 'none';
             }
             
             // お礼メッセージをアニメーションで表示
@@ -261,8 +281,8 @@ import '../styles/ar.css';
                 thankYouContainer.style.display = 'none';
                 
                 // マーカーガイドを表示
-                if (markerAnnounceImage) {
-                    markerAnnounceImage.style.display = 'flex';
+                if (markerGuide) {
+                    markerGuide.style.display = 'flex';
                 }
                 
                 // 再読み込みして新しいプロジェクトの動画を準備
