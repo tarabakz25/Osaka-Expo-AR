@@ -68,13 +68,13 @@ import '../styles/ar.css';
                         scale="2 2 2"
                         position="2 2 0"
                         text="value: テスト表示; align: center; width: 2; color: white; background-color: rgba(0,0,0,0.8); wrapCount: 20;"
-                        visible="true">
+                        visible="false">
                     </a-entity>
                     <a-video
                         id="projectVideoEntity"
                         width="6"
                         height="2"
-                        position="-1 0 0"
+                        position="0.5 0 0"
                         rotation="-45 0 0"
                         src="#projectVideo"
                         visible="false"
@@ -112,6 +112,12 @@ import '../styles/ar.css';
         const markerGuide = document.getElementById('markerGuide');
         const sceneEl = document.querySelector('a-scene');
         
+        // ★ thankYouContainerを最初から表示する
+        if (thankYouContainer) {
+            thankYouContainer.style.display = 'block';
+            thankYouContainer.style.opacity = '1';
+        }
+
         let canPlayVideo = false;
         let userInteracted = false;
 
@@ -252,6 +258,8 @@ import '../styles/ar.css';
                 markerGuide.style.display = 'none';
             }
             
+            // ★ 動画終了後のお礼メッセージ表示処理をコメントアウト
+            /*
             // お礼メッセージをアニメーションで表示
             thankYouContainer.style.opacity = '0';
             thankYouContainer.style.display = 'block';
@@ -261,6 +269,7 @@ import '../styles/ar.css';
                 thankYouContainer.style.transition = 'opacity 1.5s ease-in-out';
                 thankYouContainer.style.opacity = '1';
             }, 100);
+            */
             
             sessionStorage.setItem('selectedProject', selectedProjectIndex);
         });
@@ -277,8 +286,8 @@ import '../styles/ar.css';
                 const newProjectIndex = projectSelector.value;
                 sessionStorage.setItem('selectedProject', newProjectIndex);
                 
-                // お礼メッセージを非表示
-                thankYouContainer.style.display = 'none';
+                // ★ お礼メッセージを非表示にする処理をコメントアウト
+                // thankYouContainer.style.display = 'none';
                 
                 // マーカーガイドを表示
                 if (markerGuide) {

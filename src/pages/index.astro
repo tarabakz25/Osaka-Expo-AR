@@ -6,12 +6,6 @@ import '../styles/global.css'
 import '../styles/index.css'
 import BusinessCard from "../components/BusinessCard.astro"
 import { projects } from '../data/projects.js'
-
-// プロジェクト配列をシャッフル
-for (let i = projects.length - 1; i > 0; i--) {
-	const j = Math.floor(Math.random() * (i + 1));
-	[projects[i], projects[j]] = [projects[j], projects[i]];
-}
 ---
 
 <Layout>
@@ -32,15 +26,16 @@ for (let i = projects.length - 1; i > 0; i--) {
 			<div class="logo-container dissolve">
 				<Image src={KamiyamaLogo} alt="Kamiyama Logo" class="kamiyama-logo" />
 			</div>
-			<h1 class="welcome-title dissolve" style="animation-delay: 0.5s;">Connect with Kamiyama Marugoto Collage.</h1>
-			<h1 class="welcome-title dissolve" style="animation-delay: 1s;">神山まるごと高専とつながる。</h1>
+			<h1 class="welcome-title dissolve" style="animation-delay: 0.5s;">「泉」に触れる</h1>
+			<h1 class="welcome-title dissolve" style="animation-delay: 1s;">Touch the "spring"</h1>
 		</div>
 	</div>
 	<div class="explain_text-page" id="explainPage">
 		<div class="explain-content">
 			<h2 data-ja="このプロジェクトは？" data-en="About This Project">このプロジェクトは？</h2>
-			<p data-ja="ここでは、私たち神山まるごと高専生がARを通じて、神山まるごと高専の今を伝えるためのプロジェクトです。" data-en="In this project, we, the students of Kamiyama KOSEN, use AR technology to share what's happening at our school right now.">ここでは、私たち神山まるごと高専生がARを通じて、神山まるごと高専の今を伝えるためのプロジェクトです。</p>
-			<p data-ja="目の前にあるマネキンにかざして、実際に神山まるごと高専の今を見てみてください。" data-en="Hold your device up to the mannequin in front of you to experience the current state of Kamiyama KOSEN.">目の前にあるマネキンにかざして、実際に神山まるごと高専の"今"を体験してみましょう。</p>
+			<p data-ja="この泉は、神山まるごと高専生の“頭の中”。" data-en="This fountain is the “inside of the head” of the students of Kamiyama Marugoto College of Technology.">この泉は、神山まるごと高専生の“頭の中”。</p>
+			<p data-ja="透明で静かなようで、実は内側からアイデアが湧き出ています。" data-en="It seems clear and quiet, but in fact, ideas are bubbling up from within.">透明で静かなようで、実は内側からアイデアが湧き出ています。</p>
+			<p data-ja="その泉を、今、あなたが覗こうとしています。" data-en="Now you are about to take a peek into that fountain.">その泉を、今、あなたが覗こうとしています。</p>
 		</div>
 	</div>
 	<div class="movie_select-page" id="movieSelectPage">
@@ -184,7 +179,18 @@ for (let i = projects.length - 1; i > 0; i--) {
 
 <script is:inline define:vars={{ projects }}>
 
+	// Fisher-Yates (Knuth) Shuffle アルゴリズム
+	function shuffleArray(array) {
+		for (let i = array.length - 1; i > 0; i--) {
+			const j = Math.floor(Math.random() * (i + 1));
+			[array[i], array[j]] = [array[j], array[i]];
+		}
+	}
+
 	window.onload = function() {
+		// ページ読み込み時にプロジェクト配列をシャッフル
+		shuffleArray(projects);
+
 		// パーティクルJS初期化
 		particlesJS("particles-js", {
 		  "particles": {

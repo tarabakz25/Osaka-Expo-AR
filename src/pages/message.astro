@@ -150,6 +150,11 @@ import '../styles/message.css';
         messageForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             
+            // 送信ボタンを取得して無効化、テキストを変更
+            const submitButton = document.querySelector('.submit-button');
+            submitButton.disabled = true;
+            submitButton.textContent = '送信中...';
+            
             const formData = new FormData(messageForm);
             const selectedProjectIndexValue = formData.get('projectName'); // selectから選択されたプロジェクトのインデックス
             
@@ -206,10 +211,18 @@ import '../styles/message.css';
                     console.error('GAS request failed:', response.status, response.statusText);
                     // const errorData = await response.text(); // エラー内容をテキストで取得試行
                     alert(`メッセージの送信に失敗しました。ステータス: ${response.status}`);
+                    
+                    // エラー時はボタンを元に戻す
+                    submitButton.disabled = false;
+                    submitButton.textContent = '送信する';
                 }
             } catch (error) {
                 console.error('送信中にエラーが発生しました:', error);
                 alert('エラーが発生しました。ネットワーク接続を確認するか、もう一度お試しください。');
+                
+                // エラー時はボタンを元に戻す
+                submitButton.disabled = false;
+                submitButton.textContent = '送信する';
             }
         });
     };

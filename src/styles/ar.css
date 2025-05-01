@@ -70,7 +70,6 @@
     padding: 2em;
     border-radius: 1em;
     text-align: center;
-    display: none;
     z-index: 30;
     max-width: 90%;
     width: 400px;
@@ -285,7 +284,7 @@
     height: 100%;
     display: none;
     justify-content: center;
-    z-index: 90;
+    z-index: 0;
     opacity: 0;
     transition: opacity 1s ease-in-out;
 }
