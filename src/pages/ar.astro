@@ -114,8 +114,8 @@ import '../styles/ar.css';
         
         // ★ thankYouContainerを最初から表示する
         if (thankYouContainer) {
-            thankYouContainer.style.display = 'block';
-            thankYouContainer.style.opacity = '1';
+            thankYouContainer.style.display = 'none';
+            thankYouContainer.style.opacity = '0';
         }
 
         let canPlayVideo = false;
@@ -258,18 +258,17 @@ import '../styles/ar.css';
                 markerGuide.style.display = 'none';
             }
             
-            // ★ 動画終了後のお礼メッセージ表示処理をコメントアウト
-            /*
             // お礼メッセージをアニメーションで表示
-            thankYouContainer.style.opacity = '0';
-            thankYouContainer.style.display = 'block';
-            
-            // CSSトランジションでフェードイン
-            setTimeout(() => {
-                thankYouContainer.style.transition = 'opacity 1.5s ease-in-out';
-                thankYouContainer.style.opacity = '1';
-            }, 100);
-            */
+            if (thankYouContainer) {
+                thankYouContainer.style.opacity = '0';
+                thankYouContainer.style.display = 'block';
+                
+                // CSSトランジションでフェードイン
+                setTimeout(() => {
+                    thankYouContainer.style.transition = 'opacity 1.5s ease-in-out';
+                    thankYouContainer.style.opacity = '1';
+                }, 100);
+            }
             
             sessionStorage.setItem('selectedProject', selectedProjectIndex);
         });
