@@ -1,207 +1,249 @@
 ---
-import Layout from "../layouts/Layout.astro";
-import { projects } from '../data/projects.js';
-import '../styles/global.css';
-import '../styles/message.css';
+import Layout from "../layouts/Layout.astro"
+import { projects } from "../data/projects.js"
+import "../styles/global.css"
 ---
 
 <Layout>
-    <div id="particles-js" class="particles-container"></div>
-    <div class="message-container">
-        <h2 class="message-title">ご視聴ありがとうございました！良ければ、学生にメッセージをお願いいたします。</h2>
-        
-        <form id="messageForm" class="message-form">
-            <div class="form-group">
-                <label for="name">お名前（ニックネーム）</label>
-                <input type="text" id="name" name="name" class="form-input" placeholder="お名前を入力">
-            </div>
-            
-            <div class="form-project-name">
-                <label for="projectName">見たプロジェクト</label>
-                <select id="projectName" name="projectName" class="form-select" required>
-                    <option value="" disabled selected>プロジェクトを選択してください</option>
-                    {projects.map((project, index) => (
-                        <option value={index}>{project.name} - {project.keyword}</option>
-                    ))}
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="message">メッセージ</label>
-                <textarea id="message" name="message" rows="5" required class="form-textarea" placeholder="メッセージを入力"></textarea>
-            </div>
-            
-            <div class="form-actions">
-                <button type="submit" class="submit-button">送信する</button>
-                <a href="/" class="back-button">トップに戻る</a>
-            </div>
-        </form>
-        
-        <div id="thankYouMessage" class="thank-you-message" style="display: none;">
-            <h2>メッセージを送信しました！</h2>
-            <p>ご参加いただきありがとうございます。</p>
-            <a href="/" class="back-button">トップに戻る</a>
-        </div>
-    </div>
+	<div id="particles-js" class="fixed inset-0 z-1 bg-gradient-to-br from-blue-800 via-blue-600 to-blue-400 bg-[length:300%_300%] animate-gradient"></div>
+	<div class="relative z-2 max-w-xl mx-auto p-8 text-white flex flex-col items-center justify-center min-h-[80vh]">
+		<h2 class="text-center mb-8 text-base backdrop-blur-md">
+			ご視聴ありがとうございました！良ければ、学生にメッセージをお願いいたします。
+		</h2>
+
+		<form id="messageForm" class="rounded-lg backdrop-blur-md w-full box-border mx-auto">
+			<div class="mb-6 text-center w-full flex flex-col items-center">
+				<label for="name" class="block mb-2 text-center text-lg w-full text-white">お名前（ニックネーム）</label>
+				<input
+					type="text"
+					id="name"
+					name="name"
+					class="w-full max-w-full py-3 px-3 rounded-lg border border-white/30 text-base bg-white/20 text-white text-center box-border mx-auto"
+					placeholder="お名前を入力"
+				/>
+			</div>
+
+			<div class="mb-6 text-center w-full flex flex-col items-center">
+				<label for="projectName" class="block mb-2 text-center text-lg text-white">見たプロジェクト</label>
+				<select
+					id="projectName"
+					name="projectName"
+					class="w-full max-w-full py-3 px-3 rounded-lg border border-white/30 text-base bg-white/20 text-white text-center box-border mx-auto appearance-none bg-[url('data:image/svg+xml;charset=UTF-8,%3csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'white\'%3e%3cpath d=\'M7 10l5 5 5-5z\'/%3e%3c/svg%3e')] bg-no-repeat bg-[right_0.75rem_center] bg-[length:16px_12px] cursor-pointer"
+					required
+				>
+					<option value="" disabled selected
+						>プロジェクトを選択してください</option
+					>
+					{
+						projects.map((project, index) => (
+							<option value={index} class="bg-blue-600 text-white">
+								{project.name} - {project.keyword}
+							</option>
+						))
+					}
+				</select>
+			</div>
+			<div class="mb-6 text-center w-full flex flex-col items-center">
+				<label for="message" class="block mb-2 text-center text-lg w-full text-white">メッセージ</label>
+				<textarea
+					id="message"
+					name="message"
+					rows="5"
+					required
+					class="w-full max-w-full py-3 px-3 rounded-lg border border-white/30 text-base bg-white/20 text-white text-center box-border mx-auto resize-y min-h-[120px]"
+					placeholder="メッセージを入力"></textarea>
+			</div>
+
+			<div class="flex justify-around mt-8 w-full">
+				<button type="submit" class="py-3 px-6 rounded-full border-none text-base cursor-pointer text-center min-w-[120px] transition-all duration-300 ease-in-out bg-green-500 text-white hover:bg-green-600 hover:-translate-y-0.5">送信する</button>
+				<a href="/" class="py-3 px-6 rounded-full border-none text-base cursor-pointer text-center min-w-[120px] transition-all duration-300 ease-in-out bg-white/20 text-white hover:bg-white/30 hover:-translate-y-0.5">トップに戻る</a>
+			</div>
+		</form>
+
+		<div
+			id="thankYouMessage"
+			class="bg-white/15 p-8 rounded-lg text-center backdrop-blur-md w-full shadow-md"
+			style="display: none;"
+		>
+			<h2>メッセージを送信しました！</h2>
+			<p>ご参加いただきありがとうございます。</p>
+			<a href="/" class="py-3 px-6 rounded-full border-none text-base cursor-pointer text-center min-w-[120px] transition-all duration-300 ease-in-out bg-white/20 text-white hover:bg-white/30 hover:-translate-y-0.5 inline-block mt-4">トップに戻る</a>
+		</div>
+	</div>
 </Layout>
 
 <script is:inline src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
 
-<script>
-    // ステップ1でコピーしたGoogle Apps ScriptのWebアプリURLをここに貼り付け
-    const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyiSJ660RQD7LVRLk5fthYR6_46p4c8wd9Dzj2V7i8ykdCsHCON3GQHonz4pCSDL82E/exec'; // GAS URLをここに定義
+<script define:vars={{ projects }}>
+	// ステップ1でコピーしたGoogle Apps ScriptのWebアプリURLをここに貼り付け
+	const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyiSJ660RQD7LVRLk5fthYR6_46p4c8wd9Dzj2V7i8ykdCsHCON3GQHonz4pCSDL82E/exec'; // GAS URLをここに定義
+	
+	// プロジェクトデータを定義
+	const projectsData = projects;
 
-    window.onload = function() {
-        // パーティクルJS初期化
-        particlesJS("particles-js", {
-          "particles": {
-            "number": {
-              "value": 100,
-              "density": {
-                "enable": true,
-                "value_area": 800
-              }
-            },
-            "color": {
-              "value": "#A5DFFF"
-            },
-            "shape": {
-              "type": "circle",
-              "stroke": {
-                "width": 0,
-                "color": "#A5DFFF"
-              }
-            },
-            "opacity": {
-              "value": 0.8,
-              "random": true
-            },
-            "size": {
-              "value": 5,
-              "random": true
-            },
-            "line_linked": {
-              "enable": false,
-              "distance": 150,
-              "color": "#888888",
-              "opacity": 0.6,
-              "width": 1
-            },
-            "move": {
-              "enable": true,
-              "speed": 1,
-              "direction": "top",
-              "random": true,
-              "straight": false
-            }
-          },
-          "interactivity": {
-            "detect_on": "canvas",
-            "events": {
-              "onhover": {
-                "enable": true,
-                "mode": "repulse"
-              },
-              "onclick": {
-                "enable": true,
-                "mode": "push"
-              },
-              "resize": true
-            }
-          },
-          "retina_detect": true
-        });
-        
-        // セッションストレージから選択されたプロジェクトを取得
-        const selectedProjectIndex = sessionStorage.getItem('selectedProject');
-        const projectNameSelect = document.getElementById('projectName');
-        const messageForm = document.getElementById('messageForm');
-        const thankYouMessage = document.getElementById('thankYouMessage');
-        
-        console.log("選択されたプロジェクトインデックス:", selectedProjectIndex);
-        
-        // セッションストレージに保存されたプロジェクトがあれば、そのプロジェクトを選択状態にする
-        if (selectedProjectIndex !== null && projectsData[selectedProjectIndex]) {
-            projectNameSelect.value = selectedProjectIndex;
-        }
-        
-        // フォーム送信イベントの処理
-        messageForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            // 送信ボタンを取得して無効化、テキストを変更
-            const submitButton = document.querySelector('.submit-button');
-            submitButton.disabled = true;
-            submitButton.textContent = '送信中...';
-            
-            const formData = new FormData(messageForm);
-            const selectedProjectIndexValue = formData.get('projectName'); // selectから選択されたプロジェクトのインデックス
-            
-            // projectIndexからプロジェクト名を取得
-            let projectName = '';
-            const selectedProject = projectsData[Number(selectedProjectIndexValue)]; // projectsDataからデータ取得
-            if (selectedProject) {
-                projectName = `${selectedProject.name} - ${selectedProject.keyword}`;
-            }
-            
-            // Google Apps Scriptに送信するデータペイロードを作成
-            const payload = {
-                timestamp: new Date().toISOString(),
-                projectIndex: selectedProjectIndexValue,
-                projectName: projectName, // プロジェクト名を追加
-                name: formData.get('name'),        // フォームからの名前
-                message: formData.get('message'),    // フォームからのメッセージ
-            };
-            
-            // Google Apps Script の Web アプリ URL が設定されているか確認
-            if (!GOOGLE_APPS_SCRIPT_URL) {
-                alert('送信先のURLが設定されていません。');
-                console.error('GOOGLE_APPS_SCRIPT_URL is not set.');
-                return; // URLがなければ処理を中断
-            }
-            
-            try {
-                // 直接 Google Apps Script の Web アプリにデータを POST 送信
-                const response = await fetch(GOOGLE_APPS_SCRIPT_URL, {
-                    method: 'POST',
-                    // mode: 'no-cors', // GAS側でCORS設定が難しい場合の回避策だが、レスポンスは受け取れない
-                    headers: {
-                        // 'Content-Type': 'application/json', // GAS側が application/json を受け付ける場合
-                        'Content-Type': 'text/plain;charset=utf-8', // GAS doPost(e) で e.postData.contents を使う場合 text/plain が扱いやすいことがある
-                    },
-                    body: JSON.stringify(payload) // GAS側で JSON.parse(e.postData.contents) する想定
-                });
-                
-                // GASからのレスポンスを処理 (GASがJSONを返す想定)
-                // 注意: 'no-cors' モードでは response.ok や response.json() は機能しません。
-                //       GAS側で適切にCORSヘッダーを設定する必要があります。
-                //       もしCORSエラーが出る場合は、GAS側のdoPost関数で ContentService を使って
-                //       適切なヘッダーを返すように修正してください。
-                if (response.ok) { // レスポンスが正常 (200-299) かどうか
-                    // const result = await response.json(); // GASがJSONを返す場合
-                    // console.log('GAS Response:', result); // GASからの応答をログに出力
-                    
-                    // 送信成功メッセージを表示
-                    messageForm.style.display = 'none';
-                    thankYouMessage.style.display = 'block';
-                    
-                } else {
-                    // サーバー側 (GAS) でエラーが発生した場合
-                    console.error('GAS request failed:', response.status, response.statusText);
-                    // const errorData = await response.text(); // エラー内容をテキストで取得試行
-                    alert(`メッセージの送信に失敗しました。ステータス: ${response.status}`);
-                    
-                    // エラー時はボタンを元に戻す
-                    submitButton.disabled = false;
-                    submitButton.textContent = '送信する';
-                }
-            } catch (error) {
-                console.error('送信中にエラーが発生しました:', error);
-                alert('エラーが発生しました。ネットワーク接続を確認するか、もう一度お試しください。');
-                
-                // エラー時はボタンを元に戻す
-                submitButton.disabled = false;
-                submitButton.textContent = '送信する';
-            }
-        });
-    };
+	document.addEventListener('DOMContentLoaded', function() {
+		// パーティクルJS初期化
+		if (typeof window.particlesJS !== 'undefined') {
+			window.particlesJS("particles-js", {
+				particles: {
+					number: {
+						value: 100,
+						density: {
+							enable: true,
+							value_area: 800,
+						},
+					},
+					color: {
+						value: "#A5DFFF",
+					},
+					shape: {
+						type: "circle",
+						stroke: {
+							width: 0,
+							color: "#A5DFFF",
+						},
+					},
+					opacity: {
+						value: 0.8,
+						random: true,
+					},
+					size: {
+						value: 5,
+						random: true,
+					},
+					line_linked: {
+						enable: false,
+						distance: 150,
+						color: "#888888",
+						opacity: 0.6,
+						width: 1,
+					},
+					move: {
+						enable: true,
+						speed: 1,
+						direction: "top",
+						random: true,
+						straight: false,
+					},
+				},
+				interactivity: {
+					detect_on: "canvas",
+					events: {
+						onhover: {
+							enable: true,
+							mode: "repulse",
+						},
+						onclick: {
+							enable: true,
+							mode: "push",
+						},
+						resize: true,
+					},
+				},
+				retina_detect: true,
+			})
+		}
+
+		// セッションストレージから選択されたプロジェクトを取得
+		const selectedProjectIndex = sessionStorage.getItem('selectedProject');
+		const projectNameSelect = document.getElementById('projectName');
+		const messageForm = document.getElementById('messageForm');
+		const thankYouMessage = document.getElementById('thankYouMessage');
+		
+		console.log("選択されたプロジェクトインデックス:", selectedProjectIndex);
+		
+		// セッションストレージに保存されたプロジェクトがあれば、そのプロジェクトを選択状態にする
+		if (selectedProjectIndex !== null && projectsData[selectedProjectIndex] && projectNameSelect instanceof HTMLSelectElement) {
+			projectNameSelect.value = selectedProjectIndex;
+		}
+		
+		// フォーム送信イベントの処理
+		if (messageForm instanceof HTMLFormElement) {
+			messageForm.addEventListener('submit', async (e) => {
+				e.preventDefault();
+				
+				// 送信ボタンを取得して無効化、テキストを変更
+				const submitButton = document.querySelector('button[type="submit"]');
+				if (submitButton instanceof HTMLButtonElement) {
+					submitButton.disabled = true;
+					submitButton.textContent = '送信中...';
+				}
+				
+				const formData = new FormData(messageForm);
+				const selectedProjectIndexValue = formData.get("projectName"); // selectから選択されたプロジェクトのインデックス
+
+				// projectIndexからプロジェクト名を取得
+				let projectName = "";
+				const selectedProject = projectsData[Number(selectedProjectIndexValue)]; // projectsDataからデータ取得
+				if (selectedProject) {
+					projectName = `${selectedProject.name} - ${selectedProject.keyword}`;
+				}
+
+				// Google Apps Scriptに送信するデータペイロードを作成
+				const payload = {
+					timestamp: new Date().toISOString(),
+					projectIndex: selectedProjectIndexValue,
+					projectName: projectName, // プロジェクト名を追加
+					name: formData.get("name"), // フォームからの名前
+					message: formData.get("message"), // フォームからのメッセージ
+				};
+
+				// Google Apps Script の Web アプリ URL が設定されているか確認
+				if (!GOOGLE_APPS_SCRIPT_URL) {
+					alert("送信先のURLが設定されていません。");
+					console.error("GOOGLE_APPS_SCRIPT_URL is not set.");
+					return // URLがなければ処理を中断
+				}
+
+				try {
+					// 直接 Google Apps Script の Web アプリにデータを POST 送信
+					const response = await fetch(GOOGLE_APPS_SCRIPT_URL, {
+						method: 'POST',
+						headers: {
+							'Content-Type': 'application/json',
+						},
+						body: JSON.stringify(payload),
+					});
+
+					const result = await response.json();
+					console.log('Success:', result);
+					
+					// 送信成功したらフォームを非表示にして、送信完了メッセージを表示
+					messageForm.style.display = 'none';
+					thankYouMessage.style.display = 'block';
+					
+				} catch (error) {
+					console.error('Error:', error);
+					alert('送信中にエラーが発生しました。もう一度お試しください。');
+					
+					// エラー発生時には送信ボタンを再有効化
+					if (submitButton instanceof HTMLButtonElement) {
+						submitButton.disabled = false;
+						submitButton.textContent = '送信する';
+					}
+				}
+			});
+		}
+	});
 </script>
+
+<style>
+  @keyframes gradient {
+    0% { background-position: 0% 0%; }
+    25% { background-position: 50% 50%; }
+    50% { background-position: 100% 100%; }
+    75% { background-position: 50% 50%; }
+    100% { background-position: 0% 0%; }
+  }
+  
+  .animate-gradient {
+    animation: gradient 10s ease-in-out infinite alternate;
+  }
+  
+  /* プレースホルダーテキストのスタイル */
+  ::placeholder {
+    color: rgba(255, 255, 255, 0.7);
+    opacity: 1;
+    text-align: center;
+  }
+</style>
