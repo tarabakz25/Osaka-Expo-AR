@@ -2,33 +2,34 @@
 import Layout from "../layouts/Layout.astro"
 import { projects } from "../data/projects.js"
 import "../styles/global.css"
+import "../styles/message.css"
 ---
 
 <Layout>
-	<div id="particles-js" class="fixed inset-0 z-1 bg-gradient-to-br from-blue-800 via-blue-600 to-blue-400 bg-[length:300%_300%] animate-gradient"></div>
-	<div class="relative z-2 max-w-xl mx-auto p-8 text-white flex flex-col items-center justify-center min-h-[80vh]">
-		<h2 class="text-center mb-8 text-base backdrop-blur-md">
+	<div id="particles-js" class="particles-container"></div>
+	<div class="message-container">
+		<h2 class="message-title">
 			ご視聴ありがとうございました！良ければ、学生にメッセージをお願いいたします。
 		</h2>
 
-		<form id="messageForm" class="rounded-lg backdrop-blur-md w-full box-border mx-auto">
-			<div class="mb-6 text-center w-full flex flex-col items-center">
-				<label for="name" class="block mb-2 text-center text-lg w-full text-white">お名前（ニックネーム）</label>
+		<form id="messageForm" class="message-form">
+			<div class="form-group">
+				<label for="name">お名前（ニックネーム）</label>
 				<input
 					type="text"
 					id="name"
 					name="name"
-					class="w-full max-w-full py-3 px-3 rounded-lg border border-white/30 text-base bg-white/20 text-white text-center box-border mx-auto"
+					class="form-input"
 					placeholder="お名前を入力"
 				/>
 			</div>
 
-			<div class="mb-6 text-center w-full flex flex-col items-center">
-				<label for="projectName" class="block mb-2 text-center text-lg text-white">見たプロジェクト</label>
+			<div class="form-project-name">
+				<label for="projectName">見たプロジェクト</label>
 				<select
 					id="projectName"
 					name="projectName"
-					class="w-full max-w-full py-3 px-3 rounded-lg border border-white/30 text-base bg-white/20 text-white text-center box-border mx-auto appearance-none bg-[url('data:image/svg+xml;charset=UTF-8,%3csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'white\'%3e%3cpath d=\'M7 10l5 5 5-5z\'/%3e%3c/svg%3e')] bg-no-repeat bg-[right_0.75rem_center] bg-[length:16px_12px] cursor-pointer"
+					class="form-select"
 					required
 				>
 					<option value="" disabled selected
@@ -36,38 +37,38 @@ import "../styles/global.css"
 					>
 					{
 						projects.map((project, index) => (
-							<option value={index} class="bg-blue-600 text-white">
+							<option value={index}>
 								{project.name} - {project.keyword}
 							</option>
 						))
 					}
 				</select>
 			</div>
-			<div class="mb-6 text-center w-full flex flex-col items-center">
-				<label for="message" class="block mb-2 text-center text-lg w-full text-white">メッセージ</label>
+			<div class="form-group">
+				<label for="message">メッセージ</label>
 				<textarea
 					id="message"
 					name="message"
 					rows="5"
 					required
-					class="w-full max-w-full py-3 px-3 rounded-lg border border-white/30 text-base bg-white/20 text-white text-center box-border mx-auto resize-y min-h-[120px]"
+					class="form-textarea"
 					placeholder="メッセージを入力"></textarea>
 			</div>
 
-			<div class="flex justify-around mt-8 w-full">
-				<button type="submit" class="py-3 px-6 rounded-full border-none text-base cursor-pointer text-center min-w-[120px] transition-all duration-300 ease-in-out bg-green-500 text-white hover:bg-green-600 hover:-translate-y-0.5">送信する</button>
-				<a href="/" class="py-3 px-6 rounded-full border-none text-base cursor-pointer text-center min-w-[120px] transition-all duration-300 ease-in-out bg-white/20 text-white hover:bg-white/30 hover:-translate-y-0.5">トップに戻る</a>
+			<div class="form-actions">
+				<button type="submit" class="submit-button">送信する</button>
+				<a href="/" class="back-button">トップに戻る</a>
 			</div>
 		</form>
 
 		<div
 			id="thankYouMessage"
-			class="bg-white/15 p-8 rounded-lg text-center backdrop-blur-md w-full shadow-md"
+			class="thank-you-message"
 			style="display: none;"
 		>
 			<h2>メッセージを送信しました！</h2>
 			<p>ご参加いただきありがとうございます。</p>
-			<a href="/" class="py-3 px-6 rounded-full border-none text-base cursor-pointer text-center min-w-[120px] transition-all duration-300 ease-in-out bg-white/20 text-white hover:bg-white/30 hover:-translate-y-0.5 inline-block mt-4">トップに戻る</a>
+			<a href="/" class="back-button">トップに戻る</a>
 		</div>
 	</div>
 </Layout>
@@ -163,7 +164,7 @@ import "../styles/global.css"
 				e.preventDefault();
 				
 				// 送信ボタンを取得して無効化、テキストを変更
-				const submitButton = document.querySelector('button[type="submit"]');
+				const submitButton = document.querySelector('.submit-button');
 				if (submitButton instanceof HTMLButtonElement) {
 					submitButton.disabled = true;
 					submitButton.textContent = '送信中...';
@@ -198,25 +199,26 @@ import "../styles/global.css"
 				try {
 					// 直接 Google Apps Script の Web アプリにデータを POST 送信
 					const response = await fetch(GOOGLE_APPS_SCRIPT_URL, {
-						method: 'POST',
+						method: "POST",
+						mode: 'no-cors', // GAS側でCORS設定が難しい場合の回避策だが、レスポンスは受け取れない
 						headers: {
-							'Content-Type': 'application/json',
+							// 'Content-Type': 'application/json', // GAS側が application/json を受け付ける場合
+							"Content-Type": "text/plain;charset=utf-8", // GAS doPost(e) で e.postData.contents を使う場合 text/plain が扱いやすいことがある
 						},
-						body: JSON.stringify(payload),
+						body: JSON.stringify(payload), // GAS側で JSON.parse(e.postData.contents) する想定
 					});
 
-					const result = await response.json();
-					console.log('Success:', result);
-					
-					// 送信成功したらフォームを非表示にして、送信完了メッセージを表示
-					messageForm.style.display = 'none';
-					thankYouMessage.style.display = 'block';
-					
+					// no-corsモードではresponse.okは確認できないため、常に成功として処理する
+					// 送信成功メッセージを表示
+					if (messageForm instanceof HTMLFormElement && thankYouMessage instanceof HTMLElement) {
+						messageForm.style.display = 'none';
+						thankYouMessage.style.display = 'block';
+					}
 				} catch (error) {
-					console.error('Error:', error);
-					alert('送信中にエラーが発生しました。もう一度お試しください。');
+					console.error('送信中にエラーが発生しました:', error);
+					alert('エラーが発生しました。ネットワーク接続を確認するか、もう一度お試しください。');
 					
-					// エラー発生時には送信ボタンを再有効化
+					// エラー時はボタンを元に戻す
 					if (submitButton instanceof HTMLButtonElement) {
 						submitButton.disabled = false;
 						submitButton.textContent = '送信する';
@@ -226,24 +228,3 @@ import "../styles/global.css"
 		}
 	});
 </script>
-
-<style>
-  @keyframes gradient {
-    0% { background-position: 0% 0%; }
-    25% { background-position: 50% 50%; }
-    50% { background-position: 100% 100%; }
-    75% { background-position: 50% 50%; }
-    100% { background-position: 0% 0%; }
-  }
-  
-  .animate-gradient {
-    animation: gradient 10s ease-in-out infinite alternate;
-  }
-  
-  /* プレースホルダーテキストのスタイル */
-  ::placeholder {
-    color: rgba(255, 255, 255, 0.7);
-    opacity: 1;
-    text-align: center;
-  }
-</style>
