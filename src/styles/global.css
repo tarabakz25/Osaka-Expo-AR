@@ -1,8 +1,14 @@
-:root {
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
     --background-color: #fff;
     --text-color-white: #fff;
     --text-color-black: #000;
     --accent-color: #4a80f5;
     --default-font: 'SF Pro Text', sans-serif;
     --default-font-english: 'JetBrains Mono', monospace;
+  }
 }

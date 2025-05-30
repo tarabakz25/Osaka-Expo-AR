@@ -13,111 +13,19 @@ const { name, romaji, keyword } = Astro.props;
 
 <!-- このデザインから一切動かすな -->
 
-<div class="business-card">
+<div class="relative w-auto h-auto font-sans overflow-visible flex justify-center items-center">
   <!-- 背景として画像を直接表示 -->
-  <Image src={Card} alt="名刺背景" class="card-img" />
-  <div class="card-content">
-    <div class="card-header">
-      <p class="card-subtitle">神山まるごと高専</p>
-      <h1 class="card-name">{name}</h1>
-      <p class="card-name-roman">{romaji}</p>
+  <Image src={Card} alt="名刺背景" class="block w-auto h-auto max-w-[120px] max-h-[180px]" />
+  <div class="absolute top-0 left-0 w-full h-full flex flex-col justify-center items-center p-2 box-border text-center">
+    <div class="w-full text-center mt-0">
+      <p class="text-[0.4rem] m-0 mb-1 font-normal text-black">神山まるごと高専</p>
+      <h1 class="text-base m-1 mx-auto tracking-wider text-black leading-tight text-center">{name}</h1>
+      <p class="text-[0.4rem] m-1 mt-0 mx-auto tracking-wider text-black text-center w-full">{romaji}</p>
     </div>
     
-    <div class="card-keyword-section">
-      <p class="keyword-label">Key Word</p>
-      <p class="keyword-tag">#{keyword}</p>
+    <div class="text-center mt-4 mb-0">
+      <p class="text-[0.5rem] text-black tracking-wider mb-1">Key Word</p>
+      <p class="text-[0.6rem] font-bold m-0 mx-auto text-black tracking-wide break-keep whitespace-nowrap overflow-hidden text-center">#{keyword}</p>
     </div>
   </div>
 </div>
-
-<style>
-  .business-card {
-    position: relative;
-    width: auto; 
-    height: auto; 
-    font-family: "Zen Kaku Gothic new", sans-serif;
-    overflow: visible;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-
-  .card-img {
-    display: block;
-    width: auto;
-    height: auto;
-    max-width: 300px; /* 最大幅は制限 */
-    max-height: 450px; /* 最大高さも制限 */
-  }
-
-  .card-content {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    padding: 1.5rem;
-    box-sizing: border-box;
-    text-align: center;
-  }
-
-  .card-header {
-    width: 100%;
-    text-align: center;
-    margin-top: 0;
-  }
-
-  .card-subtitle {
-    font-size: 0.7rem;
-    margin: 0 0 0.5rem 0;
-    font-weight: normal;
-    color: #000;
-  }
-
-  .card-name {
-    font-size: 2.0rem;
-    margin: 0.5rem auto;
-    letter-spacing: 0.1em;
-    color: #000;
-    line-height: 1.2;
-    text-align: center;
-  }
-
-  .card-name-roman {
-    font-size: 0.7rem;
-    margin: 0.5rem auto 0;
-    letter-spacing: 0.1em;
-    color: #000;
-    text-align: center;
-    width: 100%;
-  }
-
-  .card-keyword-section {
-    text-align: center;
-    margin-top: 2rem;
-    margin-bottom: 0;
-  }
-
-  .keyword-label {
-    font-size: 1.0rem;
-    color: #000;
-    letter-spacing: 0.1em;
-    margin-bottom: 0.5rem;
-  }
-
-  .keyword-tag {
-    font-size: 1.2rem;
-    font-family: "Zen Kaku Gothic new Bold", sans-serif;
-    margin: 0 auto;
-    color: #000;
-    letter-spacing: 0.05em;
-    word-break: keep-all;
-    white-space: nowrap;
-    overflow: hidden;
-    text-align: center;
-  }
-</style>

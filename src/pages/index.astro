@@ -3,48 +3,50 @@ import Layout from "../layouts/Layout.astro"
 import { Image } from "astro:assets"
 import KamiyamaLogo from "../assets/Kamiyama_Logo.svg"
 import '../styles/global.css'
-import '../styles/index.css'
 import BusinessCard from "../components/BusinessCard.astro"
 import { projects } from '../data/projects.js'
 ---
 
 <Layout>
-	<div id="particles-js" class="particles-container"></div>
+	<!-- パーティクル背景 -->
+	<div id="particles-js" class="fixed top-0 left-0 w-full h-full z-[1] bg-gradient-to-br from-primary-blue-600 via-primary-blue-800 via-primary-blue-700 to-primary-blue-900 animate-gradient" style="background-size: 300% 300%;"></div>
 	
 	<!-- 波紋エフェクト用の要素 -->
-	<div id="ripple-effect" class="ripple-container"></div>
+	<div id="ripple-effect" class="fixed top-0 left-0 w-full h-full z-[90] bg-transparent pointer-events-none"></div>
 	
 	<!-- 言語切り替えボタン -->
-	<div class="language-switch">
-		<button id="langSwitch" class="lang-button">
+	<div class="fixed top-5 right-5 z-[1000]">
+		<button id="langSwitch" class="bg-white/20 text-white border border-white/50 rounded-full px-4 py-2 text-sm cursor-pointer transition-all duration-300 backdrop-blur-sm hover:bg-white/30">
 			<span id="langText">English</span>
 		</button>
 	</div>
 	
-	<div class="landing-page">
-		<div class="landing-content">
-			<div class="logo-container dissolve">
-				<Image src={KamiyamaLogo} alt="Kamiyama Logo" class="kamiyama-logo" />
+	<div class="fixed top-0 left-0 w-full h-screen flex justify-center items-center z-[2] bg-transparent transition-opacity duration-[1500ms]" id="landingPage">
+		<div class="text-center p-4 w-[90%] max-w-md md:max-w-[800px] flex flex-col justify-center items-center relative z-[95] bg-transparent rounded-[10px] mx-auto">
+			<div class="mb-6 w-full text-center opacity-0 animate-dissolve" style="animation-delay: 0s;">
+				<Image src={KamiyamaLogo} alt="Kamiyama Logo" class="w-full max-w-[280px] md:max-w-[400px] h-auto mx-auto block invert" />
 			</div>
-			<h1 class="welcome-title dissolve" style="animation-delay: 0.5s;">「泉」に触れる</h1>
-			<h1 class="welcome-title dissolve" style="animation-delay: 1s;">Touch the "spring"</h1>
+			<h1 class="text-xl md:text-2xl mx-0 my-4 text-center w-full break-keep px-2.5 py-2.5 rounded-lg text-white opacity-0 animate-dissolve shadow-lg" style="animation-delay: 0.5s; text-shadow: 0 0 10px rgba(0, 0, 0, 0.5);">「泉」に触れる</h1>
+			<h1 class="text-xl md:text-2xl mx-0 my-4 text-center w-full break-keep px-2.5 py-2.5 rounded-lg text-white opacity-0 animate-dissolve shadow-lg" style="animation-delay: 1s; text-shadow: 0 0 10px rgba(0, 0, 0, 0.5);">Touch the "spring"</h1>
 		</div>
 	</div>
-	<div class="explain_text-page" id="explainPage">
-		<div class="explain-content">
-			<h2 data-ja="体験手順" data-en="How to Experience">体験手順</h2>
-			<p data-ja="1,ブラウザ上で名刺をスライドし、コンテンツを選択してください" data-en="1. Slide the business cards in the browser and select content">1,ブラウザ上で名刺をスライドし、コンテンツを選択してください</p>
-			<p data-ja="2,カメラの使用を許可し、マネキン頭上のマーカーを読み取ってください。※この際、真上から覗き込むのではなく、画面上の白い枠にマーカーが合うようスマホを立てて読み取ってください。" data-en="2. Allow camera use and scan the marker on the mannequin head. Note: Don't look directly from above, but hold your smartphone upright so the marker fits in the white frame on the screen.">2,カメラの使用を許可し、マネキン頭上のマーカーを読み取ってください。※この際、真上から覗き込むのではなく、画面上の白い枠にマーカーが合うようスマホを立てて読み取ってください。</p>
-			<p data-ja="3,コンテンツ終了後、感想・コメントを入力してください" data-en="3. After the content ends, please enter your impressions and comments">3,コンテンツ終了後、感想・コメントを入力してください</p>
+	
+	<div class="fixed top-0 left-0 w-full h-screen flex justify-center items-center z-0 opacity-0 invisible transition-all duration-1000 bg-black/20 backdrop-blur-sm" id="explainPage">
+		<div class="text-center p-6 md:p-8 w-[85%] md:w-[90%] max-w-[600px] backdrop-blur-[10px] rounded-[15px] text-text-white">
+			<h2 class="text-base md:text-lg mb-4" data-ja="体験手順" data-en="How to Experience">体験手順</h2>
+			<p class="text-sm md:text-base mb-4 leading-relaxed" data-ja="1,ブラウザ上で名刺をスライドし、コンテンツを選択してください" data-en="1. Slide the business cards in the browser and select content">1,ブラウザ上で名刺をスライドし、コンテンツを選択してください</p>
+			<p class="text-sm md:text-base mb-4 leading-relaxed" data-ja="2,カメラの使用を許可し、マネキン頭上のマーカーを読み取ってください。※この際、真上から覗き込むのではなく、画面上の白い枠にマーカーが合うようスマホを立てて読み取ってください。" data-en="2. Allow camera use and scan the marker on the mannequin head. Note: Don't look directly from above, but hold your smartphone upright so the marker fits in the white frame on the screen.">2,カメラの使用を許可し、マネキン頭上のマーカーを読み取ってください。※この際、真上から覗き込むのではなく、画面上の白い枠にマーカーが合うようスマホを立てて読み取ってください。</p>
+			<p class="text-sm md:text-base mb-4 leading-relaxed" data-ja="3,コンテンツ終了後、感想・コメントを入力してください" data-en="3. After the content ends, please enter your impressions and comments">3,コンテンツ終了後、感想・コメントを入力してください</p>
 		</div>
 	</div>
-	<div class="movie_select-page" id="movieSelectPage">
-		<div class="movie-select-content">
-			<h2 class="page-title" data-ja="プロジェクト紹介" data-en="Project Introduction">プロジェクト紹介</h2>
-			<div class="card-slider-container">
-				<div class="card-slider" id="cardSlider">
+	
+	<div class="fixed top-0 left-0 w-full h-screen flex justify-center items-center z-0 opacity-0 invisible transition-all duration-1000 bg-gray-900/20 overflow-hidden" id="movieSelectPage">
+		<div class="w-full max-w-full h-full flex flex-col justify-start pt-8 md:pt-[3vh] items-center text-center px-2 py-6 md:py-8 text-text-white relative">
+			<h2 class="text-lg md:text-xl mt-6 md:mt-8 mb-6 md:mb-8 text-white" data-ja="プロジェクト紹介" data-en="Project Introduction">プロジェクト紹介</h2>
+			<div class="relative w-full max-w-[500px] flex flex-col justify-start items-center touch-pan-y overflow-y-auto overflow-x-hidden h-[55vh] md:h-[60vh] max-h-[400px] md:max-h-[500px] scrollbar-hide">
+				<div class="w-full relative min-h-full touch-pan-y select-none grid grid-cols-2 auto-rows-[minmax(80px,auto)] md:auto-rows-[minmax(100px,auto)] gap-1.5 md:gap-2 px-2 md:px-2.5 py-10 md:py-12 pb-16 md:pb-20 items-start justify-items-center" id="cardsGrid">
 					{projects.map((project, index) => (
-						<div class="card-slide" data-index={index}>
+						<div class="card-item w-full max-w-[80px] md:max-w-[100px] h-auto flex justify-center items-center transition-all duration-300 opacity-100 transform scale-[0.7] md:scale-75 cursor-pointer mb-0.5 hover:opacity-100 hover:scale-[0.8] md:hover:scale-90" data-index={index}>
 							<BusinessCard
 								name={project.name}
 								romaji={project.romaji}
@@ -53,14 +55,9 @@ import { projects } from '../data/projects.js'
 						</div>
 					))}
 				</div>
-				<div class="swipe-hint" data-ja="← スワイプでカードを切り替え →" data-en="← Swipe to change cards →">← スワイプでカードを切り替え →</div>
 			</div>
-			<div class="pagination-dots" id="paginationDots">
-				{projects.map((_, index) => (
-					<span class="dot" data-index={index}></span>
-				))}
-			</div>
-			<p class="tap-hint" data-ja="カードをタップして選択" data-en="Tap a card to select">カードをタップして選択</p>
+			<div class="mt-6 md:mt-7 mb-3 md:mb-4 text-xs md:text-sm text-white/70 text-center animate-pulse-custom" data-ja="スクロールしてすべてのプロジェクトを見る" data-en="Scroll to see all projects">スクロールしてすべてのプロジェクトを見る</div>
+			<p class="tap-hint inline-block bg-transparent mt-3 md:mt-4 mb-6 md:mb-7 text-xs md:text-sm text-white text-center backdrop-blur-none" data-ja="カードをタップして選択" data-en="Tap a card to select">カードをタップして選択</p>
 		</div>
 	</div>
 </Layout>
@@ -71,114 +68,35 @@ import { projects } from '../data/projects.js'
 <script is:inline src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
 
 <style>
-	/* 波紋エフェクト用のスタイル */
-	.ripple-container {
-		position: fixed;
-		top: 0;
-		left: 0;
-		width: 100%;
-		height: 100%;
-		z-index: 90;
-		background-color: transparent; /* 背景色を透明に変更 */
-		pointer-events: none;
+	/* カスタム背景グラデーション用アニメーション */
+	@keyframes gradient {
+		0% { background-position: 0% 0%; }
+		25% { background-position: 50% 50%; }
+		50% { background-position: 100% 100%; }
+		75% { background-position: 50% 50%; }
+		100% { background-position: 0% 0%; }
 	}
-	
-	/* ロゴと歓迎テキストのスタイル */
-	.logo-container.hidden {
-		opacity: 0;
+
+	/* ディゾルブアニメーション */
+	@keyframes dissolve-in {
+		0% { opacity: 0; }
+		100% { opacity: 1; }
 	}
-	
-	.logo-container.fade-in {
-		animation: logo-fade-in 1.5s ease forwards;
-	}
-	
-	@keyframes logo-fade-in {
-		0% {
-			opacity: 0;
-		}
-		100% {
-			opacity: 1;
-		}
-	}
-	
-	/* タイトルのディゾルブエフェクト */
-	.welcome-title.hidden {
-		opacity: 0;
-	}
-	
-	.welcome-title.fade-in {
-		animation: fade-in 1.5s ease forwards;
-	}
-	
-	@keyframes fade-in {
-		0% {
-			opacity: 0;
-		}
-		100% {
-			opacity: 1;
-		}
-	}
-	
-	/* コンテンツをより見やすくするためのスタイル追加 */
-	.landing-content {
-		position: relative;
-		z-index: 95;
-		padding: 20px;
-		border-radius: 10px;
-		max-width: 800px;
-		margin: 0 auto;
-	}
-	
-	.welcome-title {
-		color: white;
-		text-shadow: 0 0 10px rgba(0, 0, 0, 0.5); /* テキストにシャドウを追加して読みやすく */
-		margin: 15px 0;
-	}
-	
-	.kamiyama-logo {
-		max-width: 280px;
-		margin: 0 auto;
-		display: block;
-	}
-	
+
 	/* ページ遷移アニメーション */
 	.fade-out {
-		opacity: 0;
-		transition: opacity 1.5s ease;
+		opacity: 0 !important;
 		pointer-events: none;
 	}
 
 	.fade-in {
-		opacity: 1;
-		transition: opacity 1.5s ease;
-	}
-
-	.landing-page, .explain_text-page, .movie_select-page {
-		transition: opacity 1.5s ease;
-	}
-
-	.explain_text-page, .movie_select-page {
-		opacity: 0;
-	}
-	
-	/* ディゾルブアニメーション */
-	.dissolve {
-		opacity: 0;
-		animation: dissolve-in 2s ease forwards;
-	}
-	
-	@keyframes dissolve-in {
-		0% {
-			opacity: 0;
-		}
-		100% {
-			opacity: 1;
-		}
+		opacity: 1 !important;
+		visibility: visible !important;
+		z-index: 3 !important;
 	}
 </style>
 
 <script is:inline define:vars={{ projects }}>
-
 	// Fisher-Yates (Knuth) Shuffle アルゴリズム
 	function shuffleArray(array) {
 		for (let i = array.length - 1; i > 0; i--) {
@@ -202,17 +120,17 @@ import { projects } from '../data/projects.js'
 			  }
 			},
 			"color": {
-			  "value": "#6FB8E3" /* パーティクルの色を濃いめの青に変更 */
+			  "value": "#6FB8E3"
 			},
 			"shape": {
 			  "type": "circle",
 			  "stroke": {
 				"width": 0,
-				"color": "#6FB8E3" /* こちらも同じ色に変更 */
+				"color": "#6FB8E3"
 			  }
 			},
 			"opacity": {
-			  "value": 0.5, /* 不透明度を下げる */
+			  "value": 0.5,
 			  "random": true
 			},
 			"size": {
@@ -255,17 +173,16 @@ import { projects } from '../data/projects.js'
 		try {
 			$('#ripple-effect').ripples({
 				resolution: 500, 
-				dropRadius: 20,  // 波紋の大きさを大きく
-				perturbance: 0.15 // 波紋の揺れを強く
+				dropRadius: 20,
+				perturbance: 0.15
 			});
 			
 			// 自動で波紋を発生させる（初期表示用）
 			setTimeout(function() {
-				// 画面中央に波紋を発生
 				const centerX = $('#ripple-effect').width() / 2;
 				const centerY = $('#ripple-effect').height() / 2;
 				
-				$('#ripple-effect').ripples('drop', centerX, centerY, 20, 0.25); // サイズと強度を上げる
+				$('#ripple-effect').ripples('drop', centerX, centerY, 20, 0.25);
 				setTimeout(function() {$('#ripple-effect').ripples('drop', centerX, centerY, 20, 0.25);}, 300);
 				setTimeout(function() {$('#ripple-effect').ripples('drop', centerX, centerY, 20, 0.25);}, 600);
 			}, 300);
@@ -273,33 +190,15 @@ import { projects } from '../data/projects.js'
 			console.error('Wave effects not supported by browser:', e);
 		}
 
-		// コンテンツ表示の制御
-		const logoContainer = document.querySelector('.logo-container');
-		const welcomeTitles = document.querySelectorAll('.welcome-title');
-		
-		// ロゴとテキストを波紋エフェクト後に表示（遅延を3秒に短縮）
-		setTimeout(() => {
-			// ロゴとテキストを同時に表示して、アニメーション効果を適用
-			logoContainer.classList.remove('hidden');
-			logoContainer.classList.add('fade-in');
-			
-			welcomeTitles.forEach((title, index) => {
-				// タイトルを同時に表示
-				title.classList.remove('hidden');
-				title.classList.add('fade-in');
-			});
-			
-		}, 3000); // 波紋エフェクトが完了した後にコンテンツを表示（短縮）
-		
 		// ページ切り替え用の要素
-		const landingPage = document.querySelector('.landing-page');
+		const landingPage = document.getElementById('landingPage');
 		const explainPage = document.getElementById('explainPage');
 		const movieSelectPage = document.getElementById('movieSelectPage');
 		
 		// 自動遷移のタイミング設定（ミリ秒）
 		const timings = {
-			landing: 500,    // ランディングページの表示時間を短縮
-			explain: 3000      // 説明ページの表示時間を延長
+			landing: 500,
+			explain: 3000
 		};
 		
 		// ページ遷移関数
@@ -308,7 +207,6 @@ import { projects } from '../data/projects.js'
 			landingPage.classList.add('fade-out');
 			explainPage.classList.add('fade-in');
 			
-			// 次のページへの遷移をスケジュール
 			setTimeout(transitionToMovieSelect, timings.explain);
 		}
 		
@@ -318,172 +216,57 @@ import { projects } from '../data/projects.js'
 			explainPage.classList.add('fade-out');
 			movieSelectPage.classList.add('fade-in');
 			
-			// カードスライドの初期化
-			updateSlides();
+			initializeGrid();
 		}
 		
-		// タイトルアニメーション完了後に自動遷移を開始するための計算時間も調整
-		// 波紋(3000ms) + コンテンツ表示(1000ms) + 表示後の余裕(1000ms) = 5000ms
 		const totalAnimationTime = 5000;
 		setTimeout(transitionToExplain, totalAnimationTime + timings.landing);
 		
-		// スライダー関連の要素と処理
-		const cardSlides = document.querySelectorAll('.card-slide');
-		const dots = document.querySelectorAll('.dot');
-		const cardSlider = document.getElementById('cardSlider');
+		// カードアイテムとグリッドの要素
+		const cardItems = document.querySelectorAll('.card-item');
+		const cardsGrid = document.getElementById('cardsGrid');
 		
-		// 現在のカードインデックス
-		let currentIndex = 0;
-		
-		// タッチ関連の変数
-		let touchStartX = 0;
-		let touchEndX = 0;
-		let isSwiping = false;
-		
-		// カードスライダーにタッチイベントを追加
-		if (cardSlider) {
-			cardSlider.addEventListener('touchstart', function(e) {
-				e.preventDefault();
-				touchStartX = e.changedTouches[0].screenX;
-				isSwiping = false;
-			}, { passive: false });
+		// カードアイテムをタップしたときの処理
+		function handleCardTap(index) {
+			console.log("カードがタップされました:", index);
+			console.log("選択されたプロジェクト:", projects[index]);
 			
-			cardSlider.addEventListener('touchmove', function(e) {
-				e.preventDefault();
-				const currentX = e.changedTouches[0].screenX;
-				const diffX = currentX - touchStartX;
-				
-				if (Math.abs(diffX) > 5) {
-					isSwiping = true;
-				}
-			}, { passive: false });
-			
-			cardSlider.addEventListener('touchend', function(e) {
-				e.preventDefault();
-				touchEndX = e.changedTouches[0].screenX;
-				const swipeDistance = touchEndX - touchStartX;
-				
-				if (isSwiping) {
-					handleSwipe(swipeDistance);
-				} else {
-					handleCardTap();
-				}
-			}, { passive: false });
-		}
-		
-		// アクティブなカードをタップしたときの処理
-		function handleCardTap() {
-			console.log("カードがタップされました:", currentIndex);
-			// デバッグ情報を追加
-			console.log("選択されたプロジェクト:", projects[currentIndex]);
-			
-			// 選択されたプロジェクトのインデックスをセッションストレージに保存
-			sessionStorage.setItem('selectedProject', currentIndex);
+			sessionStorage.setItem('selectedProject', index);
 			console.log("sessionStorageに保存しました", sessionStorage.getItem('selectedProject'));
 			
-			// 少し遅延させてAR画面へ遷移
 			setTimeout(() => {
 				window.location.href = "/ar";
 			}, 100);
 		}
 		
-		// クリックイベントもサポート（PCユーザー向け）
-		cardSlides.forEach(slide => {
-			slide.addEventListener('click', function() {
-				if (slide.classList.contains('active')) {
-					handleCardTap();
-				}
+		// 各カードアイテムにクリックイベントを追加
+		cardItems.forEach((item, index) => {
+			item.addEventListener('click', function() {
+				handleCardTap(index);
 			});
 		});
 		
-		// スワイプの処理を自然な動きに修正
-		function handleSwipe(swipeDistance) {
-			let direction = '';
-			
-			if (swipeDistance > 30) { // 右スワイプ
-				direction = 'right';
-				if (currentIndex > 0) {
-					currentIndex--;
-				} else {
-					currentIndex = cardSlides.length - 1;
-				}
-			} else if (swipeDistance < -30) { // 左スワイプ
-				direction = 'left';
-				if (currentIndex < cardSlides.length - 1) {
-					currentIndex++;
-				} else {
-					currentIndex = 0;
-				}
-			}
-			
-			updateSlides(direction);
+		// すべてのカードを表示
+		function initializeGrid() {
+			cardItems.forEach((item) => {
+				item.style.display = 'flex';
+				item.classList.add('active');
+			});
 		}
 		
 		console.log("初期化中:", { 
-			slides: cardSlides.length, 
-			dots: dots.length, 
+			items: cardItems.length
 		});
 		
-		// 最初のスライドをアクティブに
-		if (cardSlides.length > 0) {
-			cardSlides[0].classList.add('active');
-			if (dots.length > 0) {
-				dots[0].classList.add('active');
-			}
-		}
-		
-		// スライドの状態を更新（アニメーション方向を考慮）
-		function updateSlides(direction = '') {
-			console.log("スライド更新:", currentIndex, "方向:", direction);
-			
-			// 前のインデックス値を保存（ループ処理用）
-			const prevIndex = (currentIndex === 0 && direction === 'right') ? cardSlides.length - 1 : 
-							 (currentIndex === cardSlides.length - 1 && direction === 'left') ? 0 : null;
-			
-			cardSlides.forEach((slide, index) => {
-				slide.classList.remove('active', 'prev', 'next');
-				
-				if (index === currentIndex) {
-					slide.classList.add('active');
-				} else if (direction === 'left' && currentIndex === 0 && index === cardSlides.length - 1) {
-					// 左スワイプで最後のカードから最初のカードに移動する場合、最後のカードを左側に配置
-					slide.classList.add('prev');
-				} else if (direction === 'right' && currentIndex === cardSlides.length - 1 && index === 0) {
-					// 右スワイプで最初のカードから最後のカードに移動する場合、最初のカードを右側に配置
-					slide.classList.add('next');
-				} else if (index === prevIndex) {
-					// 特別なループ処理時に、前のカードが適切な位置に配置されるようにする
-					if (direction === 'right') {
-						slide.classList.add('next');
-					} else if (direction === 'left') {
-						slide.classList.add('prev');
-					}
-				} else if (index < currentIndex) {
-					slide.classList.add('prev');
-				} else {
-					slide.classList.add('next');
-				}
-			});
-			
-			// ドットの状態も更新
-			dots.forEach((dot, index) => {
-				if (index === currentIndex) {
-					dot.classList.add('active');
-				} else {
-					dot.classList.remove('active');
-				}
-			});
-		}
+		initializeGrid();
 
-		// 言語切り替え機能の追加
+		// 言語切り替え機能
 		const langButton = document.getElementById('langSwitch');
 		const langText = document.getElementById('langText');
-		let currentLang = localStorage.getItem('language') || 'ja'; // 初期言語を日本語に設定
+		let currentLang = localStorage.getItem('language') || 'ja';
 		
-		// ページ読み込み時に保存された言語設定を適用
 		applyLanguage(currentLang);
 		
-		// 言語切り替えボタンのイベントリスナー
 		if (langButton) {
 			langButton.addEventListener('click', function() {
 				currentLang = currentLang === 'ja' ? 'en' : 'ja';
@@ -494,12 +277,10 @@ import { projects } from '../data/projects.js'
 		
 		// 言語設定を適用する関数
 		function applyLanguage(lang) {
-			// ボタンのテキストを更新
 			if (langText) {
 				langText.textContent = lang === 'ja' ? 'English' : '日本語';
 			}
 			
-			// すべての多言語対応要素を更新
 			document.querySelectorAll('[data-ja][data-en]').forEach(element => {
 				element.textContent = element.getAttribute(`data-${lang}`);
 			});
@@ -507,7 +288,7 @@ import { projects } from '../data/projects.js'
 
 		// 波紋エフェクトの後にディゾルブアニメーションを開始
 		setTimeout(() => {
-			document.querySelectorAll('.dissolve').forEach(element => {
+			document.querySelectorAll('.animate-dissolve').forEach(element => {
 				element.style.animationPlayState = 'running';
 			});
 		}, 2000);
