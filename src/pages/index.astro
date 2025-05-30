@@ -40,18 +40,27 @@ import { projects } from '../data/projects.js'
 	</div>
 	<div class="movie_select-page" id="movieSelectPage">
 		<div class="movie-select-content">
-			<h2 class="page-title" data-ja="プロジェクトを選択してください" data-en="Select a Project">プロジェクトを選択してください</h2>
-			<div class="grid-cards-container">
-				{projects.map((project, index) => (
-					<div class="grid-card" data-index={index}>
-						<BusinessCard
-							name={project.name}
-							romaji={project.romaji}
-							keyword={project.keyword}
-						/>
-					</div>
+			<h2 class="page-title" data-ja="プロジェクト紹介" data-en="Project Introduction">プロジェクト紹介</h2>
+			<div class="card-slider-container">
+				<div class="card-slider" id="cardSlider">
+					{projects.map((project, index) => (
+						<div class="card-slide" data-index={index}>
+							<BusinessCard
+								name={project.name}
+								romaji={project.romaji}
+								keyword={project.keyword}
+							/>
+						</div>
+					))}
+				</div>
+				<div class="swipe-hint" data-ja="← スワイプでカードを切り替え →" data-en="← Swipe to change cards →">← スワイプでカードを切り替え →</div>
+			</div>
+			<div class="pagination-dots" id="paginationDots">
+				{projects.map((_, index) => (
+					<span class="dot" data-index={index}></span>
 				))}
 			</div>
+			<p class="tap-hint" data-ja="カードをタップして選択" data-en="Tap a card to select">カードをタップして選択</p>
 		</div>
 	</div>
 </Layout>
@@ -165,46 +174,6 @@ import { projects } from '../data/projects.js'
 		100% {
 			opacity: 1;
 		}
-	}
-	
-	/* グリッドカードレイアウト */
-	.grid-cards-container {
-		display: grid;
-		grid-template-columns: repeat(2, 1fr);
-		gap: 16px;
-		padding: 15px;
-		justify-items: center;
-	}
-	
-	.grid-card {
-		width: 100%;
-		max-width: 120px;
-		cursor: pointer;
-		transition: all 0.3s ease;
-		opacity: 0;
-		transform: translateY(10px);
-	}
-	
-	.grid-card.visible {
-		opacity: 1;
-		transform: translateY(0);
-	}
-	
-	.grid-card:hover, .grid-card:active {
-		transform: translateY(-5px) scale(1.05);
-		box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-	}
-	
-	/* ページタイトル */
-	.page-title {
-		text-align: center;
-		margin: 2.5rem;
-		padding: 1rem;
-		border-radius: 0.5rem;
-		background: rgba(255, 255, 255, 0.1);
-		backdrop-filter: blur(8px);
-		font-weight: bold;
-		font-size: 1.5rem;
 	}
 </style>
 
@@ -349,8 +318,8 @@ import { projects } from '../data/projects.js'
 			explainPage.classList.add('fade-out');
 			movieSelectPage.classList.add('fade-in');
 			
-			// グリッドカードの初期化
-			initializeGridCards();
+			// カードスライドの初期化
+			updateSlides();
 		}
 		
 		// タイトルアニメーション完了後に自動遷移を開始するための計算時間も調整
@@ -358,37 +327,153 @@ import { projects } from '../data/projects.js'
 		const totalAnimationTime = 5000;
 		setTimeout(transitionToExplain, totalAnimationTime + timings.landing);
 		
-		// グリッドカード関連の処理
-		const gridCards = document.querySelectorAll('.grid-card');
+		// スライダー関連の要素と処理
+		const cardSlides = document.querySelectorAll('.card-slide');
+		const dots = document.querySelectorAll('.dot');
+		const cardSlider = document.getElementById('cardSlider');
 		
-		// カードを順番に表示
-		function initializeGridCards() {
-			gridCards.forEach((card, index) => {
-				setTimeout(() => {
-					card.classList.add('visible');
-				}, index * 200); // 200ms間隔でフェードイン
-			});
+		// 現在のカードインデックス
+		let currentIndex = 0;
+		
+		// タッチ関連の変数
+		let touchStartX = 0;
+		let touchEndX = 0;
+		let isSwiping = false;
+		
+		// カードスライダーにタッチイベントを追加
+		if (cardSlider) {
+			cardSlider.addEventListener('touchstart', function(e) {
+				e.preventDefault();
+				touchStartX = e.changedTouches[0].screenX;
+				isSwiping = false;
+			}, { passive: false });
+			
+			cardSlider.addEventListener('touchmove', function(e) {
+				e.preventDefault();
+				const currentX = e.changedTouches[0].screenX;
+				const diffX = currentX - touchStartX;
+				
+				if (Math.abs(diffX) > 5) {
+					isSwiping = true;
+				}
+			}, { passive: false });
+			
+			cardSlider.addEventListener('touchend', function(e) {
+				e.preventDefault();
+				touchEndX = e.changedTouches[0].screenX;
+				const swipeDistance = touchEndX - touchStartX;
+				
+				if (isSwiping) {
+					handleSwipe(swipeDistance);
+				} else {
+					handleCardTap();
+				}
+			}, { passive: false });
 		}
 		
-		// カードクリックイベント
-		gridCards.forEach((card) => {
-			card.addEventListener('click', function() {
-				const index = parseInt(this.getAttribute('data-index'));
-				
-				console.log("カードがクリックされました:", index);
-				// デバッグ情報を追加
-				console.log("選択されたプロジェクト:", projects[index]);
-				
-				// 選択されたプロジェクトのインデックスをセッションストレージに保存
-				sessionStorage.setItem('selectedProject', index.toString());
-				console.log("sessionStorageに保存しました", sessionStorage.getItem('selectedProject'));
-				
-				// 少し遅延させてAR画面へ遷移
-				setTimeout(() => {
-					window.location.href = "/ar";
-				}, 100);
+		// アクティブなカードをタップしたときの処理
+		function handleCardTap() {
+			console.log("カードがタップされました:", currentIndex);
+			// デバッグ情報を追加
+			console.log("選択されたプロジェクト:", projects[currentIndex]);
+			
+			// 選択されたプロジェクトのインデックスをセッションストレージに保存
+			sessionStorage.setItem('selectedProject', currentIndex);
+			console.log("sessionStorageに保存しました", sessionStorage.getItem('selectedProject'));
+			
+			// 少し遅延させてAR画面へ遷移
+			setTimeout(() => {
+				window.location.href = "/ar";
+			}, 100);
+		}
+		
+		// クリックイベントもサポート（PCユーザー向け）
+		cardSlides.forEach(slide => {
+			slide.addEventListener('click', function() {
+				if (slide.classList.contains('active')) {
+					handleCardTap();
+				}
 			});
 		});
+		
+		// スワイプの処理を自然な動きに修正
+		function handleSwipe(swipeDistance) {
+			let direction = '';
+			
+			if (swipeDistance > 30) { // 右スワイプ
+				direction = 'right';
+				if (currentIndex > 0) {
+					currentIndex--;
+				} else {
+					currentIndex = cardSlides.length - 1;
+				}
+			} else if (swipeDistance < -30) { // 左スワイプ
+				direction = 'left';
+				if (currentIndex < cardSlides.length - 1) {
+					currentIndex++;
+				} else {
+					currentIndex = 0;
+				}
+			}
+			
+			updateSlides(direction);
+		}
+		
+		console.log("初期化中:", { 
+			slides: cardSlides.length, 
+			dots: dots.length, 
+		});
+		
+		// 最初のスライドをアクティブに
+		if (cardSlides.length > 0) {
+			cardSlides[0].classList.add('active');
+			if (dots.length > 0) {
+				dots[0].classList.add('active');
+			}
+		}
+		
+		// スライドの状態を更新（アニメーション方向を考慮）
+		function updateSlides(direction = '') {
+			console.log("スライド更新:", currentIndex, "方向:", direction);
+			
+			// 前のインデックス値を保存（ループ処理用）
+			const prevIndex = (currentIndex === 0 && direction === 'right') ? cardSlides.length - 1 : 
+							 (currentIndex === cardSlides.length - 1 && direction === 'left') ? 0 : null;
+			
+			cardSlides.forEach((slide, index) => {
+				slide.classList.remove('active', 'prev', 'next');
+				
+				if (index === currentIndex) {
+					slide.classList.add('active');
+				} else if (direction === 'left' && currentIndex === 0 && index === cardSlides.length - 1) {
+					// 左スワイプで最後のカードから最初のカードに移動する場合、最後のカードを左側に配置
+					slide.classList.add('prev');
+				} else if (direction === 'right' && currentIndex === cardSlides.length - 1 && index === 0) {
+					// 右スワイプで最初のカードから最後のカードに移動する場合、最初のカードを右側に配置
+					slide.classList.add('next');
+				} else if (index === prevIndex) {
+					// 特別なループ処理時に、前のカードが適切な位置に配置されるようにする
+					if (direction === 'right') {
+						slide.classList.add('next');
+					} else if (direction === 'left') {
+						slide.classList.add('prev');
+					}
+				} else if (index < currentIndex) {
+					slide.classList.add('prev');
+				} else {
+					slide.classList.add('next');
+				}
+			});
+			
+			// ドットの状態も更新
+			dots.forEach((dot, index) => {
+				if (index === currentIndex) {
+					dot.classList.add('active');
+				} else {
+					dot.classList.remove('active');
+				}
+			});
+		}
 
 		// 言語切り替え機能の追加
 		const langButton = document.getElementById('langSwitch');
