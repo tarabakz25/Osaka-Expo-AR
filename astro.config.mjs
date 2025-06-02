@@ -11,7 +11,8 @@ export default defineConfig({
           'saved-salmon-big.ngrok-free.app',
           'singular-terrier-ideally.ngrok-free.app',
           "inviting-mostly-badger.ngrok-free.app",
-          'finer-clever-aphid.ngrok-free.app'
+          'finer-clever-aphid.ngrok-free.app',
+          'f13d-2a09-bac5-461f-1e14-00-2ff-6d.ngrok-free.app'
         ]
     },
     output: 'static', 

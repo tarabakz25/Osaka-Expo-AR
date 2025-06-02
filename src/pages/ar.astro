@@ -54,8 +54,7 @@ import '../styles/ar.css';
             <a-scene
                 vr-mode-ui="enabled: false;"
                 renderer="logarithmicDepthBuffer: true; precision: medium;"
-                embedded
-                arjs="trackingMethod: best; sourceType: webcam;">
+                arjs="trackingMethod: best; sourceType: webcam; debugUIEnabled: false;">
                 
                 <!-- アセット管理システム -->
                 <a-assets>
@@ -83,7 +82,7 @@ import '../styles/ar.css';
                     </a-video>
                 </a-marker>
                 <!-- カメラ -->
-                <a-entity camera></a-entity>
+                <a-entity camera look-controls="enabled: false" wasd-controls="enabled: false"></a-entity>
             </a-scene>
         </div>
         
@@ -168,6 +167,15 @@ import '../styles/ar.css';
             userInteracted = true;
             startOverlay.style.display = 'none';
 
+            // A-Frameシーンの準備完了を待つ
+            if (sceneEl.hasLoaded) {
+                initializeAR();
+            } else {
+                sceneEl.addEventListener('loaded', initializeAR);
+            }
+        }, { once: true });
+
+        function initializeAR() {
             // マーカー読み取り案内を1秒後にディゾルブで表示
             setTimeout(() => {
                 if (markerGuide) {
@@ -194,11 +202,8 @@ import '../styles/ar.css';
                 }
             }
 
-            if (sceneEl && !sceneEl.hasLoaded) {
-                 console.log('A-Frame scene not loaded yet, user interaction occurred.');
-            }
-
-        }, { once: true });
+            console.log('AR initialized successfully');
+        }
 
         const selectedProjectIndex = sessionStorage.getItem('selectedProject') || 0;
         const selectedProject = projects[selectedProjectIndex];

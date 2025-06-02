@@ -8,7 +8,9 @@ import '../styles/global.css';
 		<meta charset="UTF-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 		<meta name="mobile-web-app-capable" content="yes">
+		<meta name="format-detection" content="telephone=no">
 	</head>
 	<body class="m-0 p-0 overflow-hidden font-[var(--default-font)]">
 		<slot />
@@ -23,10 +25,17 @@ import '../styles/global.css';
 		--accent-gradient: linear-gradient(45deg, rgb(var(--accent)), rgb(var(--accent-light)) 30%, white 60%);
 	}
 	
-	body {
+	html, body {
 		margin: 0;
 		padding: 0;
 		overflow: hidden;
+		width: 100vw;
+		height: 100vh;
+		position: fixed;
+	}
+	
+	* {
+		box-sizing: border-box;
 	}
 </style>
 
